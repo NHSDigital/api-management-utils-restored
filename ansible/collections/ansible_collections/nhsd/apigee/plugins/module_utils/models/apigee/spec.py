@@ -31,3 +31,6 @@ class ApigeeSpec(pydantic.BaseModel):
         if native.get("guid"):
             native.update({"guid": str(native["guid"])})
         return native
+
+    class Config:
+        extra = "forbid"

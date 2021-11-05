@@ -8,24 +8,15 @@ from ansible_collections.nhsd.apigee.plugins.module_utils.models.apigee.spec imp
 )
 from ansible_collections.nhsd.apigee.plugins.module_utils.models.apigee.product import (
     ApigeeProduct,
+    LITERAL_APIGEE_ENVIRONMENTS
 )
 
 
 class ManifestApigeeEnvironment(pydantic.BaseModel):
-    name: typing.Literal[
-        "internal-dev",
-        "internal-dev-sandbox",
-        "internal-qa",
-        "internal-qa-sandbox",
-        "ref",
-        "dev",
-        "sandbox",
-        "int",
-        "prod",
-    ]
-    products: typing.List[ApigeeProduct]
-    specs: typing.List[ApigeeSpec]
-    api_catalog: typing.List[ApigeeApidoc]
+    name: LITERAL_APIGEE_ENVIRONMENTS
+    products: typing.List[ApigeeProduct] = []
+    specs: typing.List[ApigeeSpec] = []
+    api_catalog: typing.List[ApigeeApidoc] = []
 
     @pydantic.validator("products", "specs")
     def names_unique(cls, values):
@@ -49,3 +40,14 @@ class ManifestApigeeEnvironment(pydantic.BaseModel):
                     f"specId {item.specId} not in list of specs in this environment"
                 )
         return api_catalog
+
+    @pydantic.validator("products", pre=True)
+    def set_single_environment(cls, products, values):
+        """
+        Manually set the product environments to match manifest
+        environment.
+        """
+        env = values["name"]
+        for i in range(len(products)):
+            products[i]["environments"] = [env]
+        return products

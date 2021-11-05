@@ -36,11 +36,29 @@ parameters:
   - name: friendly_api_name
     default: ''
   - name: portal_api_requires_callback_url
-    type: boolean
   - name: make_spec_visible
-    type: boolean
+    # To mark a pipeline variable as deprecated, go to the
+    # apigee-deployment.yml and give it a default value of 'DEPRECATED'.
+    # Then add it to this list.
+  - name: _deprecated_pipeline_variables
+    type: object
+    default:
+      - product_display_name
+      - product_description
+      - make_spec_visible
+      - portal_api_requires_callback_url
+      - spec_file
 
 steps:
+  # Warn user they are passing deprecated variables to the deployment pipeline
+  - ${{ each variable_name in parameters._deprecated_pipeline_variables }}:
+    - ${{ if ne(parameters[variable_name], 'DEPRECATED') }}:
+      - bash: |
+          echo "##[warning]Pipeline parameter ${{ variable_name }} is deprecated"
+          echo "##[warning]The value that appears in Apigee is derived from your repository's manifest.yml/manifest_template.yml file."
+          echo "##[warning]To remove this warning stop passing the variable into the pipeline parameters."
+          echo "##vso[task.complete result=SucceededWithIssues;]DONE"
+        displayName: Warn ${{ variable_name }} is a deprecated pipeline parameter
   - bash: |
       ls -R
       if [[ -f ecs-deploy-${{ parameters.apigee_environment }}.yml ]] || [[ -f ecs-proxies-deploy.yml ]] || [[ -f ecs-proxies-deploy-sandbox.yml ]]; then
@@ -75,68 +93,68 @@ steps:
     displayName: setup terraform
     condition: and(succeeded(), eq(variables['deploy_containers'], 'true'))
 
-  - bash: |
-      echo "Deploying ${{ parameters.service_name }} artifact $(SERVICE_ARTIFACT_NAME) as ${{ parameters.fully_qualified_service_name }} to ${{ parameters.service_base_path }} on $(ENV_URL)"
-    displayName: 'Deploy Info'
+  - ${{ if parameters.proxy_path }}:
+    - bash: |
+        echo "Deploying ${{ parameters.service_name }} artifact $(SERVICE_ARTIFACT_NAME) as ${{ parameters.fully_qualified_service_name }} to ${{ parameters.service_base_path }} on $(ENV_URL)"
+      displayName: 'Deploy Info'
 
-  - ${{ each pre_template_step in parameters.pre_template }}:
-    - ${{ pre_template_step }}
+    - ${{ each pre_template_step in parameters.pre_template }}:
+      - ${{ pre_template_step }}
 
-  # pre_template steps might have been doing cross account stuff
-  # make sure we bring everything back to the correct AWS role here
-  - template: ../components/aws-assume-role.yml
-    parameters:
-      role: "auto-ops"
-      profile: "apm_${{ parameters.aws_account }}"
-      aws_account: "${{ parameters.aws_account }}"
+    # pre_template steps might have been doing cross account stuff
+    # make sure we bring everything back to the correct AWS role here
+    - template: ../components/aws-assume-role.yml
+      parameters:
+        role: "auto-ops"
+        profile: "apm_${{ parameters.aws_account }}"
+        aws_account: "${{ parameters.aws_account }}"
 
-  - ${{ if parameters.jinja_templates }}:
-      - bash: mkdir -p group_vars/all && touch jinja_templates.yml
-        workingDirectory: "$(UTILS_DIR)/ansible/"
-        displayName: Prepare extra template-proxy vars
+    - ${{ if parameters.jinja_templates }}:
+        - bash: mkdir -p group_vars/all && touch jinja_templates.yml
+          workingDirectory: "$(UTILS_DIR)/ansible/"
+          displayName: Prepare extra template-proxy vars
 
-      - ${{ each jinja_template in parameters.jinja_templates }}:
-        - bash: 'echo "${{ jinja_template.key }}: ${{ jinja_template.value }}" >> jinja_templates.yml'
-          workingDirectory: "$(UTILS_DIR)/ansible/group_vars/all"
-          displayName: "Set ${{ jinja_template.key }} to ${{ jinja_template.value }}"
+        - ${{ each jinja_template in parameters.jinja_templates }}:
+          - bash: 'echo "${{ jinja_template.key }}: ${{ jinja_template.value }}" >> jinja_templates.yml'
+            workingDirectory: "$(UTILS_DIR)/ansible/group_vars/all"
+            displayName: "Set ${{ jinja_template.key }} to ${{ jinja_template.value }}"
 
-  - bash: |
-      set -euo pipefail
+    - bash: |
+        set -euo pipefail
 
-      export SERVICE_NAME="${{ parameters.service_name }}"
-      export PROXIES_DIR="$(SERVICE_DIR)/proxies"
-      export SERVICE_BASE_PATH="${{ parameters.service_base_path }}"
-      export APIGEE_ENVIRONMENT="${{ parameters.apigee_environment }}"
-      export HOSTED_TARGET_CONNECTION_PATH_SUFFIX="${{ parameters.hosted_target_connection_path_suffix }}"
-      export HOSTED_TARGET_HEALTHCHECK_SUFFIX="${{ parameters.hosted_target_healthcheck_suffix }}"
-      export SOURCE_COMMIT_ID=$(Build.SourceVersion)
-      export RELEASE_RELEASEID=$(Build.BuildId)
+        export SERVICE_NAME="${{ parameters.service_name }}"
+        export PROXIES_DIR="$(SERVICE_DIR)/proxies"
+        export SERVICE_BASE_PATH="${{ parameters.service_base_path }}"
+        export APIGEE_ENVIRONMENT="${{ parameters.apigee_environment }}"
+        export HOSTED_TARGET_CONNECTION_PATH_SUFFIX="${{ parameters.hosted_target_connection_path_suffix }}"
+        export HOSTED_TARGET_HEALTHCHECK_SUFFIX="${{ parameters.hosted_target_healthcheck_suffix }}"
+        export SOURCE_COMMIT_ID=$(Build.SourceVersion)
+        export RELEASE_RELEASEID=$(Build.BuildId)
 
-      if [[ $SERVICE_ARTIFACT_NAME == v* ]]; then
-        export DEPLOYED_VERSION=`echo $SERVICE_ARTIFACT_NAME | grep -o "v[0-9]\+\.[0-9]\+\.[0-9]\+-[[:alpha:]]\+" | tail -1`
-      else
-        export DEPLOYED_VERSION="${{ parameters.fully_qualified_service_name }}"
-      fi
+        if [[ $SERVICE_ARTIFACT_NAME == v* ]]; then
+          export DEPLOYED_VERSION=`echo $SERVICE_ARTIFACT_NAME | grep -o "v[0-9]\+\.[0-9]\+\.[0-9]\+-[[:alpha:]]\+" | tail -1`
+        else
+          export DEPLOYED_VERSION="${{ parameters.fully_qualified_service_name }}"
+        fi
 
-      if [ -f  $(SERVICE_DIR)/.build_env_vars ]; then
-        source $(SERVICE_DIR)/.build_env_vars
-      fi
+        if [ -f  $(SERVICE_DIR)/.build_env_vars ]; then
+          source $(SERVICE_DIR)/.build_env_vars
+        fi
 
-      cd $(UTILS_DIR)
-      ANSIBLE_FORCE_COLOR=yes \
-      make --no-print-directory -C ansible template-proxies
+        cd $(UTILS_DIR)
+        ANSIBLE_FORCE_COLOR=yes \
+        make --no-print-directory -C ansible template-proxies
 
-      if [ -f $(SERVICE_DIR)/manifest.yml ]; then
-          DIST_DIR=$(SERVICE_DIR) \
-          PROXY_DIR=${{ parameters.proxy_path }} \
-          ANSIBLE_FORCE_COLOR=yes \
-          make --no-print-directory -C ansible add-apim-guids-policy
-      fi
+        if [ -f $(SERVICE_DIR)/manifest.yml ]; then
+            DIST_DIR=$(SERVICE_DIR) \
+            PROXY_DIR=${{ parameters.proxy_path }} \
+            ANSIBLE_FORCE_COLOR=yes \
+            make --no-print-directory -C ansible add-apim-guids-policy
+        fi
+      displayName: Template proxies
 
-    displayName: Template proxies
-
-  - ${{ each post_template_step in parameters.post_template }}:
-    - ${{ post_template_step }}
+    - ${{ each post_template_step in parameters.post_template }}:
+      - ${{ post_template_step }}
 
   - ${{ each pre_deploy_step in parameters.pre_deploy }}:
     - ${{ pre_deploy_step }}
@@ -201,177 +219,149 @@ steps:
     displayName: Deploy ECS proxies
     condition: and(succeeded(), ne(variables['DEPLOY_ROLE'], ''))
 
-  - bash: |
-      declare -A FRIENDLY_ENV_NAMES=( ["prod"]="(Production)" \
-                                      ["sandbox"]="(Sandbox)" \
-                                      ["int"]="(Integration Testing)" \
-                                      ["dev"]="(Development)" \
-                                      ["ref"]="(Reference)" \
-                                      ["internal-qa"]="(Internal QA)" \
-                                      ["internal-qa-sandbox"]="(Internal QA Sandbox)" \
-                                      ["internal-dev"]="(Internal Development)" \
-                                      ["internal-dev-sandbox"]="(Internal Development Sandbox)" \
-                                    )
-      export FRIENDLY_ENV="${FRIENDLY_ENV_NAMES["${{ parameters.apigee_environment }}"]}"
+  - ${{ if parameters.proxy_path }}:
+    - bash: |
+        set -euo pipefail
 
-      if [ -z "${{ parameters.friendly_api_name }}" ]; then
-        export API_NAME="${{ parameters.fully_qualified_service_name }} ${FRIENDLY_ENV}"
-      else
-        export API_NAME="${{ parameters.friendly_api_name }} ${FRIENDLY_ENV}"
-      fi
+        export PROXY_DIR="$(SERVICE_DIR)/proxies/${{ parameters.proxy_path }}"
+        export SERVICE_NAME="${{ parameters.service_name }}"
+        export FULLY_QUALIFIED_SERVICE_NAME="${{ parameters.fully_qualified_service_name }}"
+        export SERVICE_BASE_PATH="${{ parameters.service_base_path }}"
+        export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
+        export APIGEE_ENVIRONMENT="${{ parameters.apigee_environment }}"
+        export APIGEE_ORGANIZATION="nhsd-${{ parameters.apigee_organization }}"
+        export PING="${{ parameters.ping }}"
+        export ANSIBLE_FORCE_COLOR=yes
 
-      echo "Setting friendly name of: $API_NAME"
-
-      echo "##vso[task.setvariable variable=FRIENDLY_NAME]$API_NAME"
-    displayName: "Set Portal API Friendly Name"
+        make --no-print-directory -C $(UTILS_DIR)/ansible deploy-apigee-proxy
+      displayName: Deploy proxy
 
   - bash: |
       set -euo pipefail
 
-      export PROXY_DIR="$(SERVICE_DIR)/proxies/${{ parameters.proxy_path }}"
-      export SERVICE_NAME="${{ parameters.service_name }}"
-      export FULLY_QUALIFIED_SERVICE_NAME="${{ parameters.fully_qualified_service_name }}"
-      export SERVICE_BASE_PATH="${{ parameters.service_base_path }}"
       export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
-      export PRODUCT_DISPLAY_NAME="${{ parameters.product_display_name }}"
-      export PRODUCT_DESCRIPTION="${{ parameters.product_description }}"
       export APIGEE_ENVIRONMENT="${{ parameters.apigee_environment }}"
       export APIGEE_ORGANIZATION="nhsd-${{ parameters.apigee_organization }}"
-      export RELEASE_RELEASEID="$(Build.BuildId)"
-      export PING="${{ parameters.ping }}"
       export ANSIBLE_FORCE_COLOR=yes
+      export DIST_DIR=$(SERVICE_DIR)
+      export PULL_REQUEST="${{ parameters.pr_label }}"
 
-      make --no-print-directory -C $(UTILS_DIR)/ansible deploy-apigee-proxy
+      make --no-print-directory -C $(UTILS_DIR)/ansible deploy-manifest
+    displayName: 'Deploy Manifest'
 
-      if [ -f $(SERVICE_DIR)/manifest.yml ]; then
-          export DIST_DIR=$(SERVICE_DIR)
-          export PULL_REQUEST="${{ parameters.pr_label }}"
-          make --no-print-directory -C $(UTILS_DIR)/ansible deploy-manifest
-      else
-          if [[ ! -z "${PRODUCT_DISPLAY_NAME}" ]]; then
-              if [[ -n "${{ parameters.spec_file }}" ]]; then
-                  export SPEC_FILE="$(SERVICE_DIR)/${{ parameters.spec_file }}"
-              fi
-              export FRIENDLY_NAME="$(FRIENDLY_NAME)"
-              export VISIBLE="${{ parameters.make_spec_visible }}"
-              export REQUIRE_CALLBACK_URL="${{ parameters.portal_api_requires_callback_url }}"
-              make --no-print-directory -C $(UTILS_DIR)/ansible deploy-apigee-product-and-spec
-          fi
-      fi
-    displayName: 'Deploy Proxy, Product and Spec'
+  - ${{ if parameters.proxy_path }}:
+    - bash: |
+        set -euo pipefail
 
-  - bash: |
-      set -euo pipefail
+        echo "Setting stage name as snake case for monitoring"
+        export MONITORING_STAGE_NAME="${{ replace(parameters.stage_name, '_', '-') }}"
+        echo "MONITORING_STAGE_NAME=${MONITORING_STAGE_NAME}"
+        echo "##vso[task.setvariable variable=MONITORING_STAGE_NAME]$MONITORING_STAGE_NAME"
 
-      echo "Setting stage name as snake case for monitoring"
-      export MONITORING_STAGE_NAME="${{ replace(parameters.stage_name, '_', '-') }}"
-      echo "MONITORING_STAGE_NAME=${MONITORING_STAGE_NAME}"
-      echo "##vso[task.setvariable variable=MONITORING_STAGE_NAME]$MONITORING_STAGE_NAME"
+        if [[ "${{ parameters.apigee_environment }}" == "prod" ]]; then
+          export url="https://api.service.nhs.uk/monitoring-sd/service"
+          export status_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx_with_api_key https://api.service.nhs.uk/${{ parameters.service_base_path }}/_status" ] } }'
+          export ping_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx https://api.service.nhs.uk/${{ parameters.service_base_path }}/_ping" ] } }'
+        else
+          export url="https://internal-dev.api.service.nhs.uk/monitoring-sd/service"
+          export status_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx_with_api_key https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_status" ] } }'
+          export ping_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_ping" ] } }'
+        fi
 
-      if [[ "${{ parameters.apigee_environment }}" == "prod" ]]; then
-        export url="https://api.service.nhs.uk/monitoring-sd/service"
-        export status_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx_with_api_key https://api.service.nhs.uk/${{ parameters.service_base_path }}/_status" ] } }'
-        export ping_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx https://api.service.nhs.uk/${{ parameters.service_base_path }}/_ping" ] } }'
-      else
-        export url="https://internal-dev.api.service.nhs.uk/monitoring-sd/service"
-        export status_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx_with_api_key https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_status" ] } }'
-        export ping_body='{ "${{ parameters.service_name }}": { "${{ parameters.apigee_environment }}": [ "${{ parameters.service_name }}@$(MONITORING_STAGE_NAME)=http_2xx https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_ping" ] } }'
-      fi
+        echo "##vso[task.setvariable variable=is_pull_request]false"
+        echo "##vso[task.setvariable variable=check_and_enable_ping]${{ parameters.enable_monitoring }}"
+        echo "##vso[task.setvariable variable=check_and_enable_status]${{ parameters.enable_status_monitoring }}"
 
-      echo "##vso[task.setvariable variable=is_pull_request]false"
-      echo "##vso[task.setvariable variable=check_and_enable_ping]${{ parameters.enable_monitoring }}"
-      echo "##vso[task.setvariable variable=check_and_enable_status]${{ parameters.enable_status_monitoring }}"
+        if [[ "${{ parameters.service_base_path }}" == *"-pr-"* ]]; then
+          echo "##vso[task.setvariable variable=check_and_enable_ping]false"
+          echo "##vso[task.setvariable variable=check_and_enable_status]false"
+          echo "##vso[task.setvariable variable=is_pull_request]true"
+        fi
 
-      if [[ "${{ parameters.service_base_path }}" == *"-pr-"* ]]; then
-        echo "##vso[task.setvariable variable=check_and_enable_ping]false"
-        echo "##vso[task.setvariable variable=check_and_enable_status]false"
-        echo "##vso[task.setvariable variable=is_pull_request]true"
-      fi
+        echo "##vso[task.setvariable variable=url]$url"
+        echo "##vso[task.setvariable variable=status_body]$status_body"
+        echo "##vso[task.setvariable variable=ping_body]$ping_body"
+      displayName: 'Set monitoring variables'
 
-      echo "##vso[task.setvariable variable=url]$url"
-      echo "##vso[task.setvariable variable=status_body]$status_body"
-      echo "##vso[task.setvariable variable=ping_body]$ping_body"
-    displayName: 'Set monitoring variables'
+    - bash: |
+        set -euo pipefail
 
-  - bash: |
-      set -euo pipefail
-    
-      if [[ "${{ parameters.apigee_environment }}" == "prod" ]]; then
-        export ping_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://api.service.nhs.uk/${{ parameters.service_base_path }}/_ping`
-      else
-        export ping_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_ping`
-      fi
+        if [[ "${{ parameters.apigee_environment }}" == "prod" ]]; then
+          export ping_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://api.service.nhs.uk/${{ parameters.service_base_path }}/_ping`
+        else
+          export ping_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_ping`
+        fi
 
-      echo _ping_response=$ping_endpoint_response
-      echo "##vso[task.setvariable variable=ping_endpoint_response]$ping_endpoint_response"
+        echo _ping_response=$ping_endpoint_response
+        echo "##vso[task.setvariable variable=ping_endpoint_response]$ping_endpoint_response"
 
-      if [[ $ping_endpoint_response == "404" ]]; then
-        echo "##vso[task.logissue type=error]Your proxy doesn't have a _ping endpoint therefore we can't monitor this proxy and it should not be released, use the flag 'enable_monitoring=false' if your API doesn't support _ping healthcheck."
-        exit 1       
-      fi
-    
-      if [[ $ping_endpoint_response != "200" ]]; then
-        echo "##vso[task.logissue type=error]Your proxy's _ping endpoint has encounted an error and should not be released until it is resolved."
-        exit 1       
-      fi
-    displayName: 'Check _ping'
-    condition: and(succeeded(), eq(variables['check_and_enable_ping'], 'true'))
- 
-  - bash: |
-      set -euo pipefail
-      
-      if [[ "${{ parameters.apigee_environment }}" == "prod" ]]; then
-        export status_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://api.service.nhs.uk/${{ parameters.service_base_path }}/_status`
-      else
-        export status_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_status`
-      fi
+        if [[ $ping_endpoint_response == "404" ]]; then
+          echo "##vso[task.logissue type=error]Your proxy doesn't have a _ping endpoint therefore we can't monitor this proxy and it should not be released, use the flag 'enable_monitoring=false' if your API doesn't support _ping healthcheck."
+          exit 1
+        fi
 
-      echo _status_response=$status_endpoint_response
-      echo "##vso[task.setvariable variable=status_endpoint_response]$status_endpoint_response"
+        if [[ $ping_endpoint_response != "200" ]]; then
+          echo "##vso[task.logissue type=error]Your proxy's _ping endpoint has encounted an error and should not be released until it is resolved."
+          exit 1
+        fi
+      displayName: 'Check _ping'
+      condition: and(succeeded(), eq(variables['check_and_enable_ping'], 'true'))
 
-      if [[ $status_endpoint_response == "404" ]]; then
-        echo "##vso[task.logissue type=error]Your proxy doesn't have a _status endpoint therefore we can't monitor this proxy and it should not be released, use the flag 'enable_status_monitoring=false' if your API doesn't support _status healthcheck."
-        exit 1            
-      fi
-      
-      if [[ $status_endpoint_response != "200" ]]; then
-        echo "##vso[task.logissue type=error]Your proxy's _status endpoint has encounted an error and should not be released until it is resolved."
-        exit 1            
-      fi
-    displayName: 'Check _status'
-    condition: and(succeeded(), eq(variables['check_and_enable_status'], 'true'))
+    - bash: |
+        set -euo pipefail
 
-  - bash: |
-      set -euo pipefail
+        if [[ "${{ parameters.apigee_environment }}" == "prod" ]]; then
+          export status_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://api.service.nhs.uk/${{ parameters.service_base_path }}/_status`
+        else
+          export status_endpoint_response=`curl -s -o /dev/null -w '%{http_code}' -H "apikey: $(status-endpoint-api-key)" https://${{ parameters.apigee_environment }}.api.service.nhs.uk/${{ parameters.service_base_path }}/_status`
+        fi
 
-      curl --fail -X 'POST' -H 'apikey: $(MONITORING_API_KEY)' -d '$(status_body)' $(url)
-    displayName: Enable _status monitoring
-    condition: and(succeeded(), eq(variables['check_and_enable_status'], 'true'))
+        echo _status_response=$status_endpoint_response
+        echo "##vso[task.setvariable variable=status_endpoint_response]$status_endpoint_response"
 
-  - bash: |
-      set -euo pipefail
+        if [[ $status_endpoint_response == "404" ]]; then
+          echo "##vso[task.logissue type=error]Your proxy doesn't have a _status endpoint therefore we can't monitor this proxy and it should not be released, use the flag 'enable_status_monitoring=false' if your API doesn't support _status healthcheck."
+          exit 1
+        fi
 
-      curl --fail -X 'DELETE' -H 'apikey: $(MONITORING_API_KEY)' -d '$(status_body)' $(url)
-      echo
-      echo "_status endpoint monitoring is disabled"
-    displayName: Disable _status monitoring
-    condition: and(succeeded(), eq(variables['check_and_enable_status'], 'false'), eq(variables['is_pull_request'], 'false'))
+        if [[ $status_endpoint_response != "200" ]]; then
+          echo "##vso[task.logissue type=error]Your proxy's _status endpoint has encounted an error and should not be released until it is resolved."
+          exit 1
+        fi
+      displayName: 'Check _status'
+      condition: and(succeeded(), eq(variables['check_and_enable_status'], 'true'))
 
-  - bash: |
-      set -euo pipefail
+    - bash: |
+        set -euo pipefail
 
-      curl --fail -X 'POST' -H 'apikey: $(MONITORING_API_KEY)' -d '$(ping_body)' $(url)
-    displayName: Enable _ping monitoring
-    condition: and(succeeded(), eq(variables['check_and_enable_ping'], 'true'))
+        curl --fail -X 'POST' -H 'apikey: $(MONITORING_API_KEY)' -d '$(status_body)' $(url)
+      displayName: Enable _status monitoring
+      condition: and(succeeded(), eq(variables['check_and_enable_status'], 'true'))
 
-  - bash: |
-      set -euo pipefail
+    - bash: |
+        set -euo pipefail
 
-      curl --fail -X 'DELETE' -H 'apikey: $(MONITORING_API_KEY)' -d '$(ping_body)' $(url)
-      echo
-      echo "_ping endpoint monitoring is disabled"
-    displayName: Disable _ping monitoring
-    condition: and(succeeded(), eq(variables['check_and_enable_ping'], 'false'), eq(variables['is_pull_request'], 'false'))
+        curl --fail -X 'DELETE' -H 'apikey: $(MONITORING_API_KEY)' -d '$(status_body)' $(url)
+        echo
+        echo "_status endpoint monitoring is disabled"
+      displayName: Disable _status monitoring
+      condition: and(succeeded(), eq(variables['check_and_enable_status'], 'false'), eq(variables['is_pull_request'], 'false'))
+
+    - bash: |
+        set -euo pipefail
+
+        curl --fail -X 'POST' -H 'apikey: $(MONITORING_API_KEY)' -d '$(ping_body)' $(url)
+      displayName: Enable _ping monitoring
+      condition: and(succeeded(), eq(variables['check_and_enable_ping'], 'true'))
+
+    - bash: |
+        set -euo pipefail
+
+        curl --fail -X 'DELETE' -H 'apikey: $(MONITORING_API_KEY)' -d '$(ping_body)' $(url)
+        echo
+        echo "_ping endpoint monitoring is disabled"
+      displayName: Disable _ping monitoring
+      condition: and(succeeded(), eq(variables['check_and_enable_ping'], 'false'), eq(variables['is_pull_request'], 'false'))
 
   - ${{ each post_deploy_step in parameters.post_deploy }}:
     - ${{ post_deploy_step }}

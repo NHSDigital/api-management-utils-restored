@@ -1,12 +1,16 @@
+from typing import Optional
 import pydantic
 
 
 class ApigeeApidoc(pydantic.BaseModel):
     edgeAPIProductName: str
-    anonAllowed: bool
-    description: str
-    requireCallbackUrl: bool
-    title: str
-    visibility: bool
+    anonAllowed: bool = True
+    description: str = None
+    requireCallbackUrl: bool = False
+    title: str = None
+    visibility: bool = False
     specId: str = ""
     specContent: str = ""
+
+    class Config:
+        extra = "forbid"

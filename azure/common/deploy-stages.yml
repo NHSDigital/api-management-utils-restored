@@ -6,7 +6,6 @@ parameters:
   - name: spec_file
     type: string
   - name: portal_api_requires_callback_url
-    type: boolean
   - name: ping
     type: boolean
   - name: deploy_template
