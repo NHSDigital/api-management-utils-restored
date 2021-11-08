@@ -41,12 +41,12 @@ stages:
 
                   - template: ./print-aws-info.yml
 
-                  # - task: s3-cache-action@1
-                  #   inputs:
-                  #     key: poetry | utils | poetry.lock
-                  #     location: ".venv"
-                  #     debug: true
-                  #   displayName: cache utils pre-requisites 
+                  - task: s3-cache-action@1
+                    inputs:
+                      key: poetry | utils | poetry.lock
+                      location: ".venv"
+                      debug: true
+                    displayName: cache utils pre-requisites 
 
                   - bash: make install
                     displayName: Install project dependencies

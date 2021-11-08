@@ -182,19 +182,19 @@ jobs:
       - checkout: common
         path: "s/${{ parameters.service_name }}/utils"
 
-      # - task: s3-cache-action@1
-      #   inputs:
-      #     key: poetry | $(System.DefaultWorkingDirectory) | ${{ parameters.service_name }}/utils/poetry.lock
-      #     location: "${{ parameters.service_name }}/utils/.venv"
-      #     debug: true
-      #     alias: 'Utils'
-      #   displayName: cache utils dependencies
+      - task: s3-cache-action@1
+        inputs:
+          key: poetry | $(System.DefaultWorkingDirectory) | ${{ parameters.service_name }}/utils/poetry.lock
+          location: "${{ parameters.service_name }}/utils/.venv"
+          debug: true
+          alias: 'Utils'
+        displayName: cache utils dependencies
 
       - bash: |
             make install
             sleep 5
         workingDirectory: "${{ parameters.service_name }}/utils"
-        # condition: ne(variables['CacheRestored-Utils'], 'true')
+        condition: ne(variables['CacheRestored-Utils'], 'true')
         displayName: "Install utils "
 
       - bash: |
