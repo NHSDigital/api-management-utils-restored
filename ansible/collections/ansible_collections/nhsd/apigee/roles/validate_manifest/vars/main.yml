@@ -1,1 +1,2 @@
 DIST_DIR: "{{ lookup('env', 'DIST_DIR') }}"
+SERVICE_NAME: "{{ lookup('env', 'SERVICE_NAME') }}"

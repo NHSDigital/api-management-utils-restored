@@ -34,9 +34,7 @@ parameters:
   - name: product_description
   - name: spec_file
   - name: portal_api_requires_callback_url
-    type: boolean
   - name: make_spec_visible
-    type: boolean
   - name: friendly_api_name
   - name: ping
     type: boolean

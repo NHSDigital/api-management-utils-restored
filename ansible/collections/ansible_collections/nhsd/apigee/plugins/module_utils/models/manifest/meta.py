@@ -4,7 +4,7 @@ import typing
 
 from ansible_collections.nhsd.apigee.plugins.module_utils.paas import api_registry
 
-SCHEMA_VERSION = "1.1.2"
+SCHEMA_VERSION = "1.1.4"
 
 _REGISTRY_DATA = {}
 

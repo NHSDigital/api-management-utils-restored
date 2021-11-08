@@ -12,29 +12,13 @@ parameters:
   - name: service_base_path
     displayName: Service Base Path
     type: string
-  - name: product_display_name
-    displayName: Service Display Name
-    type: string
-  - name: product_description
-    displayName: Description
-    type: string
   - name: proxy_path
-    displayName: Path to proxy directory from /proxies at the project root
+    displayName: Path to proxy directory from /proxies at the project root (set empty to skip proxy deployment)
     type: string
     default: live
   - name: deploy_review_sandbox
     displayName: Deploy review sandbox?
     type: boolean
-    default: false
-  - name: spec_file
-    displayName: Path to OAS spec file for this service
-    type: string
-    default: ''
-  - name: portal_api_requires_callback_url
-    displayName: Does the portal api require a callback url? (only valid for deploy spec)
-    default: true
-  - name: make_spec_visible
-    displayName: Make spec available for developer subscription? (only valid if spec_file is specified)
     default: false
   - name: fully_qualified_service_name
     displayName: Supply a custom name for your release (only valid for release pipeline)
@@ -149,6 +133,18 @@ parameters:
           - int
           - sandbox
           - prod
+    # Deprecated pipeline variables.
+  - name: product_display_name
+    default: 'DEPRECATED'
+  - name: product_description
+    default: 'DEPRECATED'
+  - name: portal_api_requires_callback_url
+    default: 'DEPRECATED'
+  - name: make_spec_visible
+    default: 'DEPRECATED'
+  - name: spec_file
+    default: 'DEPRECATED'
+
 
 extends:
   template: ./deploy-stages.yml

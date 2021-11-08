@@ -248,13 +248,6 @@ jobs:
         displayName: "Copy utils into artifact"
 
       - bash: |
-          if [ -d "products" ]; then
-             rsync -a products dist
-          fi
-        workingDirectory: "${{ parameters.service_name }}"
-        displayName: "Copy products into artifact"
-
-      - bash: |
           set -euo pipefail
           export DIST_DIR=`pwd`/dist
           export ANSIBLE_FORCE_COLOR=yes

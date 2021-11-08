@@ -6,6 +6,7 @@ from pydantic import (
     ValidationError,
     constr,
     conint,
+    conlist,
     validator,
     root_validator,
 )
@@ -14,7 +15,17 @@ from ansible_collections.nhsd.apigee.plugins.module_utils.models.apigee.rate_lim
     RateLimitingConfig,
 )
 
-
+LITERAL_APIGEE_ENVIRONMENTS = Literal[
+    "internal-dev",
+    "internal-dev-sandbox",
+    "internal-qa",
+    "internal-qa-sandbox",
+    "ref",
+    "dev",
+    "sandbox",
+    "int",
+    "prod",
+]
 MANUAL_APPROVAL_EXCEPTIONS = ["canary-api-prod"]
 
 
@@ -110,7 +121,7 @@ def _count_cls(items: List[Any], cls: Type):
 
 class ApigeeProduct(BaseModel):
     name: str
-    approvalType: Literal["auto", "manual"]
+    approvalType: Literal["auto", "manual"] = "manual"
     attributes: List[
         Union[
             ApigeeProductAttributeAccess,
@@ -118,15 +129,24 @@ class ApigeeProduct(BaseModel):
             ApigeeProductAttributeRateLimiting,
             ApigeeProductAttribute,
         ],
-    ]
-    description: str
-    displayName: str
-    environments: List[str]
-    proxies: List[str]
-    quota: constr(regex=r"[1-9][0-9]*")
-    quotaInterval: constr(regex=r"[1-9][0-9]*")
-    quotaTimeUnit: Literal["minute", "hour"]
-    scopes: List[str]
+    ] = [{"name": "access", "value": "private"}]
+    description: str = None
+    displayName: str = None
+
+    # Note: This value is manually inserted by apigee_environment
+    # object that contains this product. So if you do not provide a
+    # value in the manifest file it is still populated.
+    environments: conlist(
+        item_type=LITERAL_APIGEE_ENVIRONMENTS, min_items=1, max_items=1
+    )
+    proxies: List[str] = []
+    quota: constr(regex=r"[1-9][0-9]*") = None
+    quotaInterval: constr(regex=r"[1-9][0-9]*") = None
+    quotaTimeUnit: Literal["minute", "hour"] = None
+    scopes: List[str] = []
+
+    class Config:
+        extra = "forbid"
 
     @root_validator
     def override_approval_type_for_prod(cls, values):
@@ -136,7 +156,7 @@ class ApigeeProduct(BaseModel):
             values["approvalType"] = "manual"
         return values
 
-    @validator("environments", "scopes", "proxies")
+    @validator("environments", "scopes", "proxies", check_fields=False)
     def sorted(cls, v):
         return sorted(v)
 
@@ -146,7 +166,7 @@ class ApigeeProduct(BaseModel):
 
         class_min_max = [
             (ApigeeProductAttributeAccess, 1, 1),
-            (ApigeeProductAttributeRateLimit, 1, 1),
+            (ApigeeProductAttributeRateLimit, 0, 1),
             (ApigeeProductAttributeRateLimiting, 0, 1),
         ]
 
@@ -164,3 +184,24 @@ class ApigeeProduct(BaseModel):
                 )
 
         return attributes
+
+    @validator("proxies", always=True)
+    def ensure_identity_service(cls, proxies, values):
+        """
+        We never want to deploy products with no proxies, as that
+        allows access to absolutely everything in the apigee
+        organization.
+
+        This validator will inject the identity-service for the
+        environment if the list of proxies is empty.
+        """
+        if len(proxies) == 0:
+            env = values["environments"][0]
+            return [f"identity-service-{env}"]
+        return proxies
+
+    @validator("displayName", always=True)
+    def validate_display_name(cls, displayName, values):
+        if not displayName:
+            return values["name"]
+        return displayName

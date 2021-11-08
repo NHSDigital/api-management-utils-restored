@@ -13,7 +13,7 @@ stages:
         displayName: Manual Approval Required
         timeoutInMinutes: 60
         pool:
-          vmImage: "Ubuntu-16.04"
+          vmImage: "ubuntu-latest"
         environment: ${{ parameters.manual_approval_env }}
         strategy:
           runOnce:
