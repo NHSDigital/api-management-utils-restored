@@ -24,12 +24,12 @@
   set_fact:
     portal_filter: "{{ apidocs.json.data | to_json | from_json | json_query(item) }}"
   with_items: 
-    - "[?contains(apiId, '-pr-')]"
-    - "[?contains(apiId, '-apm-')]"
-    - "[?contains(apiId, '-aea-')]"
-    - "[?contains(apiId, '-adz-')]"
-    - "[?contains(apiId, '-apmspii-')]"
-    - "[?contains(apiId, '-dependabot-')]"
+    - "[?contains(specId, '-pr-')]"
+    - "[?contains(specId, '-apm-')]"
+    - "[?contains(specId, '-aea-')]"
+    - "[?contains(specId, '-adz-')]"
+    - "[?contains(specId, '-apmspii-')]"
+    - "[?contains(specId, '-dependabot-')]"
   register: search_result
 
 - name: make a list and set portal_api
