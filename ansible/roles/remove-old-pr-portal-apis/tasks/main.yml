@@ -1,15 +1,3 @@
-# - name: list portals
-#   uri:
-#     url: "{{ portals_list_uri }}"
-#     headers:
-#       Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
-#     return_content: yes
-#   register: portals
-
-# - name: set portal_id
-#   set_fact:
-#     portal_id: "{{ portals.json.data[1].id }}"
-
 - name: get apidocs
   uri:
     url: "{{ portals_base_uri }}/{{ portal_id }}/apidocs"
