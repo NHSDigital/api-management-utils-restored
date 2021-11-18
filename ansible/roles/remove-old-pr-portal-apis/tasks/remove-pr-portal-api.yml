@@ -25,11 +25,11 @@
       - "age_hours, {{ age_hours }}"
       - "should remove,  {{ should_remove }}"
 
-- name: "remove pr portal api {{ item.apiId }}"
-  uri:
-    url: "{{ portals_base_uri }}/{{ portal_id }}/apidocs/{{ item.id }}"
-    method: DELETE
-    headers:
-      Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
-  when: should_remove
-  changed_when: yes
+# - name: "remove pr portal api {{ item.apiId }}"
+#   uri:
+#     url: "{{ portals_base_uri }}/{{ portal_id }}/apidocs/{{ item.id }}"
+#     method: DELETE
+#     headers:
+#       Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
+#   when: should_remove
+#   changed_when: yes
