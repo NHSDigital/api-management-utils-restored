@@ -103,12 +103,12 @@ jobs:
         displayName: Install utils pre-requisites
 
       - bash: |
-          poetry run ansible-test units --python=3.8
+          ANSIBLE_FORCE_COLOR=yes poetry run ansible-test units --python=3.8
         workingDirectory: ansible/collections/ansible_collections/nhsd/apigee
         displayName: Unit test ansible
 
       - bash: |
-          poetry run ansible-test integration --python=3.8
+          ANSIBLE_FORCE_COLOR=yes poetry run ansible-test integration --python=3.8
         workingDirectory: ansible/collections/ansible_collections/nhsd/apigee
         displayName: Integration test ansible
         
