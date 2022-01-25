@@ -73,33 +73,33 @@ jobs:
           apigee_username: $(APIGEE_USERNAME)
           apigee_password: $(APIGEE_PASSWORD)
 
-      # - bash: |
-      #     export APIGEE_ORGANIZATION="nhsd-nonprod"
-      #     export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
-      #     export retain_hours=12
-      #     ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-auto-apps
-      #   displayName: "cleanup old auto apps"
+      - bash: |
+          export APIGEE_ORGANIZATION="nhsd-nonprod"
+          export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
+          export retain_hours=12
+          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-auto-apps
+        displayName: "cleanup old auto apps"
 
-      # - bash: |
-      #     export APIGEE_ORGANIZATION="nhsd-nonprod"
-      #     export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
-      #     export retain_hours=12
-      #     ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-auto-products
-      #   displayName: "cleanup old auto products"
+      - bash: |
+          export APIGEE_ORGANIZATION="nhsd-nonprod"
+          export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
+          export retain_hours=12
+          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-auto-products
+        displayName: "cleanup old auto products"
 
-      # - bash: |
-      #     export APIGEE_ORGANIZATION="nhsd-nonprod"
-      #     export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
-      #     export retain_hours=72
-      #     ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-pr-portal-apis
-      #   displayName: "cleanup old pr portal apis"
+      - bash: |
+          export APIGEE_ORGANIZATION="nhsd-nonprod"
+          export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
+          export retain_hours=72
+          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-pr-portal-apis
+        displayName: "cleanup old pr portal apis"
 
-      # - bash: |
-      #     export APIGEE_ORGANIZATION="nhsd-nonprod"
-      #     export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
-      #     export retain_hours=72
-      #     ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-pr-specs
-      #   displayName: "cleanup old pr specs"
+      - bash: |
+          export APIGEE_ORGANIZATION="nhsd-nonprod"
+          export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
+          export retain_hours=72
+          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-pr-specs
+        displayName: "cleanup old pr specs"
 
       - bash: |
           export APIGEE_ORGANIZATION="nhsd-nonprod"
