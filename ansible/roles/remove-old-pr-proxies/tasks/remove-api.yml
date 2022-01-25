@@ -39,36 +39,36 @@
       - "age_hours, {{ age_hours }}"
       - "should remove,  {{ should_remove }}"
 
-- name: "remove api"
-  block:
-    - name: get api revisions
-      uri:
-        url: "{{ apis_uri }}/{{ api_slug }}/revisions"
-        headers:
-          Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
-        return_content: yes
-      register: get_api_revisions
+# - name: "remove api"
+#   block:
+#     - name: get api revisions
+#       uri:
+#         url: "{{ apis_uri }}/{{ api_slug }}/revisions"
+#         headers:
+#           Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
+#         return_content: yes
+#       register: get_api_revisions
 
-    - name: undeploy revisions
-      include_tasks: undeploy-revision.yml
-      loop: "{{ get_api_revisions.json }}"
-      loop_control:
-        loop_var: "revision"
-        label: "undeploy - {{ api_slug }}:{{ revision }}"
+#     - name: undeploy revisions
+#       include_tasks: undeploy-revision.yml
+#       loop: "{{ get_api_revisions.json }}"
+#       loop_control:
+#         loop_var: "revision"
+#         label: "undeploy - {{ api_slug }}:{{ revision }}"
 
-    - name: remove api from product
-      include_tasks: remove-api-product.yml
-      loop: "{{ api_products_map.get(api_slug, []) }}"
-      loop_control:
-        loop_var: "product_slug"
-        label: "detach - {{ api_slug }}:{{ product_slug }}"
+#     - name: remove api from product
+#       include_tasks: remove-api-product.yml
+#       loop: "{{ api_products_map.get(api_slug, []) }}"
+#       loop_control:
+#         loop_var: "product_slug"
+#         label: "detach - {{ api_slug }}:{{ product_slug }}"
 
-    - name: "removing api {{ api_slug }}"
-      uri:
-        url: "{{ apis_uri }}/{{ api_slug }}"
-        method: DELETE
-        headers:
-          Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
-      changed_when: yes
+#     - name: "removing api {{ api_slug }}"
+#       uri:
+#         url: "{{ apis_uri }}/{{ api_slug }}"
+#         method: DELETE
+#         headers:
+#           Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
+#       changed_when: yes
 
-  when: should_remove
+#   when: should_remove

@@ -108,9 +108,9 @@ jobs:
           ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-pr-products
         displayName: "cleanup old pr products"
 
-      # - bash: |
-      #     export APIGEE_ORGANIZATION="nhsd-nonprod"
-      #     export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
-      #     export retain_hours=72
-      #     ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-pr-proxies
-      #   displayName: "cleanup old pr proxies"
+      - bash: |
+          export APIGEE_ORGANIZATION="nhsd-nonprod"
+          export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
+          export retain_hours=72
+          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-pr-proxies
+        displayName: "cleanup old pr proxies"

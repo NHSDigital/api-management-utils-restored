@@ -21,7 +21,7 @@
 
 - name: filter apis
   set_fact:
-    pr_apis: "{{  get_apis.json | select('match', '.*-pr-[0-9]+.*') }}"
+    pr_apis: "{{  get_apis.json | select('match', '.*-pr-[0-9]+.*') | reject('match', 'e-referrals-service-api-alpha-pr-196.*') }}"
 
 - name: remove pr apis
   include_tasks: remove-api.yml
