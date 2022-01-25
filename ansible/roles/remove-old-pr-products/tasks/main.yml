@@ -36,8 +36,12 @@
   set_fact:
     pr_products: "{{  products.json | select('match', '.*-pr-[0-9]+.*') }}"
 
+- name: filter out ers exception
+  set_fact:
+    pr_products_exptn_removed: "{{  pr_products.json | reject('match', 'e-referrals-service-api-alpha-pr-196.*') }}"
+
 - name: remove pr products
   include_tasks: remove-product.yml
-  loop: "{{ pr_products }}"
+  loop: "{{ pr_products_exptn_removed }}"
   loop_control:
     loop_var: "product_slug"
