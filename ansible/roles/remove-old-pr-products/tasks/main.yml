@@ -32,9 +32,12 @@
     return_content: yes
   register: products
 
+# The exception list for - reject('match', 'e-referrals-service-api-alpha-pr-126.*') - Is a pre-agreed and temporary solution.
+# This should be taken out once it is no longer needed.
+# No other exceptions should be added
 - name: filter products
   set_fact:
-    pr_products: "{{  products.json | select('match', '.*-pr-[0-9]+.*') }}"
+    pr_products: "{{  products.json | select('match', '.*-pr-[0-9]+.*') | reject('match', 'e-referrals-service-api-alpha-pr-126.*') }}"
 
 - name: remove pr products
   include_tasks: remove-product.yml
