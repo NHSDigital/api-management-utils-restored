@@ -25,12 +25,21 @@ class ActionModule(ApigeeAction):
         # as APIGEE_SPEC_RESOURCES will not exist!
         if apidoc.specId:
             try:
-                specs = utils.select_unique(task_vars["APIGEE_SPEC_RESOURCES"], "name", apidoc.specId, valid_lengths=[1])
-            except ValueError as e:
+                # TODO: here we loosen the selection criteria to just
+                # pick the first match rather than asserting that
+                # there has to be exactly 1 spec that matches.
+                specs = [
+                    next(
+                        filter(
+                            lambda spec: spec["name"] == apidoc.specId,
+                            task_vars["APIGEE_SPEC_RESOURCES"],
+                        ),
+                    ),
+                ]
+            except StopIteration as e:
                 return {
                     "failed": True,
                     "msg": f"Unable to find unique spec resource named {apidoc.specId}",
-                    "matching_resources": json.loads(str(e))
                 }
             if check_mode:
                 # Then we never PUT this on the remote, so our entry has no 'id'
