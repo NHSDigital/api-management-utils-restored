@@ -24,23 +24,16 @@ class ActionModule(ApigeeAction):
         # This will fail if apigee_apidoc is called before apigee_spec
         # as APIGEE_SPEC_RESOURCES will not exist!
         if apidoc.specId:
-            try:
-                # TODO: here we loosen the selection criteria to just
-                # pick the first match rather than asserting that
-                # there has to be exactly 1 spec that matches.
-                specs = [
-                    next(
-                        filter(
-                            lambda spec: spec["name"] == apidoc.specId,
-                            task_vars["APIGEE_SPEC_RESOURCES"],
-                        ),
-                    ),
-                ]
-            except StopIteration as e:
-                return {
-                    "failed": True,
-                    "msg": f"Unable to find unique spec resource named {apidoc.specId}",
-                }
+            # TODO: here we loosen the selection criteria to just
+            # pick the first match rather than asserting that
+            # there has to be exactly 1 spec that matches.
+            specs = list(
+                filter(
+                    lambda spec: spec["name"] == apidoc.specId,
+                    task_vars["APIGEE_SPEC_RESOURCES"],
+                )
+            )
+
             if check_mode:
                 # Then we never PUT this on the remote, so our entry has no 'id'
                 apidoc.specContent = ""
@@ -79,19 +72,18 @@ class ActionModule(ApigeeAction):
         if apidoc.specId:
             # Look up matching specContent
             try:
-                specs = utils.select_unique(
-                    task_vars["APIGEE_SPEC_RESOURCES"],
-                    "name",
-                    apidoc.specId,
-                    valid_lengths=[1],
+                spec = next(
+                    filter(
+                        lambda spec: spec["name"] == apidoc.specId,
+                        task_vars["APIGEE_SPEC_RESOURCES"],
+                    )
                 )
-            except ValueError as e:
+            except StopIteration as e:
                 return {
                     "failed": True,
                     "msg": f"Unable to find spec named {apidoc.specId}",
-                    "matching_specs": json.loads(str(e)),
                 }
-            apidoc.specContent = specs[0].get("id")
+            apidoc.specContent = spec.get("id")
             if apidoc.specContent is None and not check_mode:
                 raise RuntimeError(f"Could not get spec id from apidoc: {json.dumps(apidoc.dict())}")
 
