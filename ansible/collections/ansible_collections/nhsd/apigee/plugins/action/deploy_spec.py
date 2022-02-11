@@ -30,18 +30,15 @@ class ActionModule(ApigeeAction):
             }
         }
 
-        try:
-            existing_resources = utils.select_unique(
+        # TODO: here we loosen the selection criteria to just
+        # pick the first match rather than asserting that
+        # there has to be exactly 1 spec that matches.
+        existing_resources = list(
+            filter(
+                lambda spec: spec["name"] == args.spec.name,
                 task_vars["APIGEE_SPEC_RESOURCES"],
-                "name",
-                args.spec.name,
             )
-        except ValueError as e:
-            return {
-                "failed": True,
-                "msg": f"Could not find unique spec resouce with name {args.spec.name}",
-                "existing_resources": json.loads(str(e)),
-            }
+        )
 
         if len(existing_resources) == 0:
             spec_resource = {
