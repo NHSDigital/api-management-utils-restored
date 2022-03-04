@@ -44,12 +44,18 @@ locals {
   }
 
   ecs_service = [
-  {% for container in ecs_service %}
+    {% for container in ecs_service %}
+    {% set BUILD_LABEL = container.pop('build_label') | default(build_label) %}
+    {% set VERSION_TAG = container.pop('version_tag') | default('') %}
+    {% set VERSION_TAG_SUFFIX = ('-' + VERSION_TAG) if VERSION_TAG else '' %}
     {{
         (
           container
           | combine(
-            {'image': '${local.account_id}.dkr.ecr.eu-west-2.amazonaws.com/' + service_id + '_' + container.name + ':' + build_label }
+            {
+              'name' : container.name + VERSION_TAG_SUFFIX,
+              'image': '${local.account_id}.dkr.ecr.eu-west-2.amazonaws.com/' + service_id + '_' + container.name + ':' + BUILD_LABEL
+            }
           )
         ) | to_json
     }},
