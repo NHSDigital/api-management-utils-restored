@@ -14,7 +14,7 @@ schedules:
 jobs:
   - job: build
     displayName: Cleanup ECS PR Proxies
-    timeoutInMinutes: 240
+    timeoutInMinutes: 360
     pool:
       name: 'AWS-ECS'
 

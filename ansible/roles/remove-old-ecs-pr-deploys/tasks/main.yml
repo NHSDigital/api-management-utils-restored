@@ -28,8 +28,23 @@
 - name: print terraform version
   debug: msg="{{ terraform_version.stdout }}"
 
+- name: switching ECS destroy to soft-fail
+  set_fact:
+    destroy_ecs_proxies_soft_fail: true
+    terraform_lock_timeout_mins: 0
+
 - name: maybe remove deployment
   include: remove-ecs-deployment.yml
   with_list: "{{ ns_service_tuples }}"
   loop_control:
     loop_var: ns_service_tuple
+
+- set_fact:
+    num_failures: "{{ destroy_ecs_proxies_failures | default({}) | dict2items | length }}"
+
+- debug: var=destroy_ecs_proxies_failures
+  when: num_failures | int > 0
+
+- fail:
+    msg: "failed to destroy some ecs pr proxies"
+  when: num_failures | int > 0
