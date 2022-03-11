@@ -48,11 +48,14 @@
       }}
 
 # left these in to print some useful info about each service
-- debug: msg="processing service - {{ apigee_environment }} - {{ service_id }} - pr - {{ pr_number }}"
-- debug: msg="created at, {{ get_service_created_at.stdout }}"
-- debug: msg="current_date, {{ ansible_date_time.iso8601 }}"
-- debug: msg="age_hours, {{ age_hours }}"
-- debug: msg="should remove,  {{ should_remove }}"
+- debug:
+    msg:
+      namespaced_name: "{{ namespaced_name }}"
+      info: "{{ apigee_environment }} - {{ service_id }} - pr - {{ pr_number }}"
+      created: "{{ get_service_created_at.stdout }}"
+      current_date: "{{ ansible_date_time.iso8601 }}"
+      age_hours: "{{ age_hours }}"
+      remove: "{{ should_remove }}"
 
 - name: "remove ecs service {{ apigee_environment }} - {{ service_id }} - pr - {{ pr_number }}"
   include_role:

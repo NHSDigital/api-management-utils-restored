@@ -1,6 +1,12 @@
 - name: print workspace
   debug: msg="workspace - {{ workspace }}"
 
+- set_fact:
+    destroy_ecs_proxies_soft_fail: "{{ destroy_ecs_proxies_soft_fail | default(false) }}"
+
+- name: print enabled soft failures
+  debug: msg="destroy_ecs_proxies_soft_fail={{destroy_ecs_proxies_soft_fail}}"
+
 - name: scale down
   command: >
     {{ aws_cmd }} ecs update-service --cluster apis-{{ apigee_environment }}
@@ -75,7 +81,7 @@
       when: not do_not_terraform
 
     - name: terraform destroy
-      shell: "make -C {{ out_dir }}/terraform apply args='-no-color -lock-timeout=30m --auto-approve' tf-command=destroy" # noqa 305
+      shell: "make -C {{ out_dir }}/terraform apply args='-no-color -lock-timeout={{ terraform_lock_timeout_mins | default(30) }}m --auto-approve' tf-command=destroy" # noqa 305
       register: tfapply
       when: not do_not_terraform
 
@@ -90,9 +96,15 @@
         var: tfapply.stderr_lines
       when: tfapply is defined
 
-    - name: force fail
+    - name: soft fail
+      set_fact:
+        destroy_ecs_proxies_failures: "{{ destroy_ecs_proxies_failures | default({}) | combine ({ namespaced_name : tfapply }) }}"        
+      when: destroy_ecs_proxies_soft_fail
+
+    - name: hard fail
       fail:
         msg: terraform failed
+      when: not destroy_ecs_proxies_soft_fail
 
   always:
     - name: remove temp dir
