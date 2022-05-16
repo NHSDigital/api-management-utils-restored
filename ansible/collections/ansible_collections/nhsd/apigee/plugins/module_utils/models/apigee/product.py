@@ -1,7 +1,8 @@
 import json
 from typing import Union, Literal, List, Dict, Any, Type
-
+from typing_extensions import Annotated
 from pydantic import (
+    Field,
     BaseModel,
     ValidationError,
     constr,
@@ -109,11 +110,18 @@ PRODUCT_ATTRIBUTE_REGEX = (
     + ")$)"
 )
 
-
-class ApigeeProductAttribute(BaseModel):
+class ApigeeProductAttributeOther(BaseModel):
     name: constr(regex=PRODUCT_ATTRIBUTE_REGEX)
     value: str
 
+ApigeeProductAttributeSpecial = Annotated[
+    Union [
+        ApigeeProductAttributeAccess,
+        ApigeeProductAttributeRateLimit,
+        ApigeeProductAttributeRateLimiting,
+    ],
+    Field(discriminator="name")
+]
 
 def _count_cls(items: List[Any], cls: Type):
     return sum(isinstance(item, cls) for item in items)
@@ -122,14 +130,7 @@ def _count_cls(items: List[Any], cls: Type):
 class ApigeeProduct(BaseModel):
     name: str
     approvalType: Literal["auto", "manual"] = "manual"
-    attributes: List[
-        Union[
-            ApigeeProductAttributeAccess,
-            ApigeeProductAttributeRateLimit,
-            ApigeeProductAttributeRateLimiting,
-            ApigeeProductAttribute,
-        ],
-    ] = [{"name": "access", "value": "private"}]
+    attributes: List[Union[ApigeeProductAttributeSpecial, ApigeeProductAttributeOther]] = [{"name": "access", "value": "private"}]
     description: str = None
     displayName: str = None
 
