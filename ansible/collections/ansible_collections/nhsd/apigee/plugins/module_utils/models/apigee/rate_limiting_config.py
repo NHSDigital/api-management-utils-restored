@@ -33,7 +33,7 @@ class QuotaConfig(ExcludeNoneModel):
     enabled: bool = None
     interval: conint(gt=0) = None
     limit: conint(gt=0) = None
-    timeunit: Literal["minute", "hour"] = None
+    timeunit: Literal["minute", "hour", "day", "week", "month"] = None
 
 
 class SpikeArrestConfig(ExcludeNoneModel):
