@@ -19,6 +19,11 @@ parameters:
     type: boolean
   - name: approval_env
     type: string
+  - name: _auth_server
+    type: object
+    default:
+      nonprod: login.apigee.com
+      prod: nhs-digital-prod.login.apigee.com
 
 stages:
   - stage: approve_then_remove_target_proxy
