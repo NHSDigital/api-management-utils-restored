@@ -24,7 +24,7 @@
       path: "{{ base_dir }}/{{ images_map[item].path }}"
       dockerfile: "{{ base_dir }}/{{ images_map[item].dockerfile }}"
       pull: yes
-      network: host
+      # network: host
     source: build
     force_source: yes
     push: yes
