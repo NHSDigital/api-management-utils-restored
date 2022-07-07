@@ -78,6 +78,10 @@ parameters:
     displayName: Requires manual approval
     type: boolean
     default: true
+  - name: prod_producer_approval
+    displayName: Requires producer manual approval
+    type: boolean
+    default: false
   - name: manual_approval_env
     displayName: Custom manual approval env overwrite
     type: string
@@ -163,12 +167,20 @@ extends:
           apigee_deployments:
             - ${{ each apigee_deployment in parameters.apigee_deployments }}:
               - ${{ if and(eq(apigee_deployment.environment, 'prod'), parameters.prod_requires_approval) }}:
-                - environment: manual-approval
-                  stage_name: manual_approval
-                  depends_on: []
-                  manual_approval_prod: true
-                  ${{ each var in parameters._scoped_pipeline_vars }}:
-                      ${{ var }}: ${{ parameters[var] }}
+                  ${{ if and(eq(apigee_deployment.environment, 'prod'), parameters.prod_producer_approval) }}:
+                    - environment: ${{ parameters.service_name }}
+                      stage_name: manual_approval
+                      depends_on: []
+                      manual_approval_prod: true
+                      ${{ each var in parameters._scoped_pipeline_vars }}:
+                          ${{ var }}: ${{ parameters[var] }}
+                  ${{ if and(eq(apigee_deployment.environment, 'prod'), not(parameters.prod_producer_approval)) }}:
+                    - environment: manual-approval
+                      stage_name: manual_approval
+                      depends_on: []
+                      manual_approval_prod: true
+                      ${{ each var in parameters._scoped_pipeline_vars }}:
+                          ${{ var }}: ${{ parameters[var] }}
             - ${{ each apigee_deployment in parameters.apigee_deployments }}:
               - environment: ${{ apigee_deployment.environment }}
                 stage_name: ${{ replace(coalesce (apigee_deployment.stage_name, apigee_deployment.environment), '-', '_') }}
