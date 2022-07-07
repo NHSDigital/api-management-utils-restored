@@ -81,5 +81,5 @@ stages:
         ${{ if ne('', parameters.fully_qualified_service_name) }}:
           fully_qualified_service_name: ${{ parameters.fully_qualified_service_name }}
         ${{ each param in parameters }}:
-          ${{ if notIn(param.key, 'fully_qualified_service_name', 'manual_approval_env', 'manual_approval_prod') }}:
+          ${{ if notIn(param.key, 'fully_qualified_service_name', 'manual_approval_env', 'manual_approval_prod', 'producer_approval') }}:
             ${{ param.key }}: ${{ param.value }}
