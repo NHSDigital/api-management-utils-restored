@@ -12,6 +12,9 @@ parameters:
   - name: prod_requires_approval
   - name: manual_approval_env
     type: string
+  - name: prod_producer_approval
+    type: boolean
+
 
 
 stages:
