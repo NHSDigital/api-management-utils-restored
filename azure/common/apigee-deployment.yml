@@ -171,7 +171,7 @@ extends:
                   stage_name: manual_approval
                   depends_on: []
                   manual_approval_prod: true
-                  producer_approval: ${{ paramaters.prod_producer_approval }}
+                  producer_approval: ${{ parameters.prod_producer_approval }}
                   ${{ each var in parameters._scoped_pipeline_vars }}:
                       ${{ var }}: ${{ parameters[var] }}
             - ${{ each apigee_deployment in parameters.apigee_deployments }}:
