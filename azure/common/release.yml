@@ -57,6 +57,9 @@ parameters:
   - name: manual_approval_prod
     type: boolean
     default: false
+  - name: producer_approval
+    type: boolean
+    default: false
 
 stages:
   - ${{ if eq(parameters.environment, 'manual-approval') }}:
@@ -64,7 +67,9 @@ stages:
       parameters:
         stage_name: ${{ parameters.stage_name }}
         depends_on: ${{ parameters.depends_on }}
-        ${{ if eq(true, parameters.manual_approval_prod) }}:
+        ${{ if and(eq(true, parameters.manual_approval_prod), eq(true, parameters.producer_approval)) }}:
+          manual_approval_env: ${{ parameters.service_name }}
+        ${{ if and(eq(true, parameters.manual_approval_prod), eq(false, parameters.producer_approval)) }}:
           manual_approval_env: manual-approval-prod
         ${{ if eq(false, parameters.manual_approval_prod) }}:
           manual_approval_env: ${{ parameters.manual_approval_env }}

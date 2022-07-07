@@ -172,6 +172,7 @@ extends:
                       stage_name: manual_approval
                       depends_on: []
                       manual_approval_prod: true
+                      producer_approval: true
                       ${{ each var in parameters._scoped_pipeline_vars }}:
                           ${{ var }}: ${{ parameters[var] }}
                   - ${{ if and(eq(apigee_deployment.environment, 'prod'), not(parameters.prod_producer_approval)) }}:
