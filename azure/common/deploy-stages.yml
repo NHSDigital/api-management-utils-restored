@@ -12,6 +12,9 @@ parameters:
   - name: prod_requires_approval
   - name: manual_approval_env
     type: string
+  - name: prod_producer_approval
+    type: boolean
+
 
 
 stages:
@@ -20,7 +23,7 @@ stages:
       parameters:
         ${{ insert }}: ${{ apigee_deployment }}
         ${{ each param in parameters }}:
-          ${{ if notIn(param.key, 'deploy_template', 'apigee_deployments', 'deploy_review_sandbox', 'prod_requires_approval') }}:
+          ${{ if notIn(param.key, 'deploy_template', 'apigee_deployments', 'deploy_review_sandbox', 'prod_requires_approval', 'prod_producer_approval') }}:
             ${{ param.key }}: ${{ param.value }}
 
         # Compute the apigee organization & org level part of the AWS secret/config path
