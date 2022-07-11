@@ -78,6 +78,10 @@ parameters:
     displayName: Requires manual approval
     type: boolean
     default: true
+  - name: prod_producer_approval
+    displayName: Requires producer manual approval
+    type: boolean
+    default: false
   - name: manual_approval_env
     displayName: Custom manual approval env overwrite
     type: string
@@ -167,6 +171,7 @@ extends:
                   stage_name: manual_approval
                   depends_on: []
                   manual_approval_prod: true
+                  producer_approval: ${{ parameters.prod_producer_approval }}
                   ${{ each var in parameters._scoped_pipeline_vars }}:
                       ${{ var }}: ${{ parameters[var] }}
             - ${{ each apigee_deployment in parameters.apigee_deployments }}:
