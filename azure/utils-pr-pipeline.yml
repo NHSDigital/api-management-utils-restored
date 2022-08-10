@@ -34,6 +34,11 @@ jobs:
         inputs:
           versionSpec: 3.8
 
+      - task: NodeTool@0
+        displayName: 'Use Node v14.15'
+        inputs:
+          versionSpec: 14.15
+
       - bash: |
           instance_id="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
           echo instance-id: "${instance_id}"
