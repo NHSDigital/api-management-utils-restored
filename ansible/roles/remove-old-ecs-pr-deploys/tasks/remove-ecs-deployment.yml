@@ -11,6 +11,12 @@
     msg: "unsupport API environment {{ apigee_environment }}"
   when: APIGEE_ENVIRONMENT not in ('internal-dev', 'internal-dev-sandbox')
 
+- name: Re-assume role
+  - template: ./components/aws-assume-role.yml
+    parameters:
+      role: "auto-ops"
+      profile: "apm_ptl"
+
 - name: check pr_number
   fail:
     msg: "pr_number not set"

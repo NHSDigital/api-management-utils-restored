@@ -52,7 +52,7 @@ steps:
         # add some backoff to allow for eventual consistency of IAM
         for i in {2..4};
         do
-            if aws sts assume-role --role-arn "${aws_role}" --role-session-name build-assume-role --duration-seconds 43200 > ${tmp_file}; then
+            if aws sts assume-role --role-arn "${aws_role}" --role-session-name build-assume-role > ${tmp_file}; then
                 echo assumed role
                 assumed_role="yes"
                 break
