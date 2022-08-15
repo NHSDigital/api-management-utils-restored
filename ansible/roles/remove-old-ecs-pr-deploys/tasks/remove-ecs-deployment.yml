@@ -6,6 +6,17 @@
     service_id: "{{  ns_service_tuple.0 }}"
     pr_number: "{{ ns_service_tuple.2 |  regex_replace('^' + ns_service_tuple.0 + '-', '')  }}"
 
+- name: Fail when aws assume role token is due to expire
+  fail:
+    msg: The AWS assume role session token is due to expire, please re-run pipeline to complete
+  when: >
+        (
+          (
+            (ASSUME_ROLE_EXPIRY | to_datetime('%Y-%m-%dT%H:%M:%SZ')) -
+            (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ'))
+          ).total_seconds()
+        ) < ( 3540 | int)
+
 - name: check api_environment
   fail:
     msg: "unsupport API environment {{ apigee_environment }}"
