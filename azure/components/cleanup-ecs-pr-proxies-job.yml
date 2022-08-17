@@ -14,6 +14,8 @@ steps:
           if [ ${{ parameters.retry }} -ne "2" ]; then
             echo "Re-assuming role and re-running step"
             echo "##vso[task.setvariable variable=has_aws_role_timedout;]true"
+          else
+            echo "##vso[task.setvariable variable=has_aws_role_timedout;]false"
           fi
         displayName: "Test retry logic"
         condition: or(eq( ${{ parameters.retry }}, '0'), eq(variables['has_aws_role_timedout'], 'true'))
