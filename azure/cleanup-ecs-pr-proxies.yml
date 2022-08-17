@@ -13,12 +13,12 @@ schedules:
 
 parameters:
   - name: retries
-    type: list
+    type: object
     default:
-      - 0
-      - 1
-      - 2
-      - 3
+      - "0"
+      - "1"
+      - "2"
+      - "3"
 
 jobs:
   - job: build
