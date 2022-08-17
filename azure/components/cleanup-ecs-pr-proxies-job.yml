@@ -10,7 +10,7 @@ steps:
       
       - bash: |
           echo ${{ parameters.retry }}
-          if [${{ parameters.retry }} != "2"]; then
+          if ${{ parameters.retry }} != "2"; then
             echo "Re-assuming role and re-running step"
             echo "##vso[task.setvariable variable=has_aws_role_timedout;]true"
           fi
