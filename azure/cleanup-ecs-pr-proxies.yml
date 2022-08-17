@@ -53,7 +53,7 @@ jobs:
         displayName: install dependencies
 
       - ${{ each retry in parameters.retries }}:
-        - ${{ if and(ne(retry, '0'), eq(variables['has_aws_role_timedout'], 'true')) }}:
+        - ${{ if or(eq(retry, '0'), eq(variables['has_aws_role_timedout'], 'true')) }}:
           - template: ./components/cleanup-ecs-pr-proxies-job.yml
             parameters:
               retry: '${{ retry }}'
