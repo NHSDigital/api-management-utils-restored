@@ -13,7 +13,7 @@ schedules:
 
 parameters:
   - name: retries
-    type: object
+    type: list
     default:
       - 0
       - 1
@@ -56,5 +56,5 @@ jobs:
         - ${{ if ne(variables['has_aws_role_timedout'], 'true') }}:
           - template: ./components/cleanup-ecs-pr-proxies-job.yml
             parameters:
-              retry: {{ retry }}
+              retry: '${{ retry }}'
 
