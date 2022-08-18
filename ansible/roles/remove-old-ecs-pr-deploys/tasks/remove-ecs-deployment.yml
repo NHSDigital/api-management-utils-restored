@@ -24,31 +24,6 @@
     msg: "unsupport API environment {{ apigee_environment }}"
   when: APIGEE_ENVIRONMENT not in ('internal-dev', 'internal-dev-sandbox')
 
-- name: Re assume aws role
-  shell: >
-    set -o pipefail;
-    tmp_file="~/.aws.tmp.creds.json";
-    cat ~/.aws.tmp.creds.json;
-    aws_role="$(ROLE)";
-    aws_role="auto-ops";
-    cp ~/.aws/config.default ~/.aws/config;
-    cat ~/.aws.tmp.creds.json;
-    account_id="$(aws sts get-caller-identity --query Account --output text)";
-    aws_role="arn:aws:iam::${account_id}:role/${aws_role}";
-    aws sts assume-role --role-arn "${aws_role}" --role-session-name build-assume-role > ${tmp_file};
-    cat ~/.aws/config;
-    profile="{{ aws_profile }}";
-    profile="apm_ptl";
-    cp ~/.aws/config ~/.aws/config.default;
-    echo "aws_access_key_id = $(jq -r .Credentials.AccessKeyId ${tmp_file})" >> ~/.aws/config;
-    echo "aws_secret_access_key = $(jq -r .Credentials.SecretAccessKey ${tmp_file})" >> ~/.aws/config;
-    echo "aws_session_token = $(jq -r .Credentials.SessionToken ${tmp_file})" >> ~/.aws/config;
-    sed -i "s#\[default\]#\[profile ${profile}\]#" ~/.aws/config;
-    cat ~/.aws/config;
-  args:
-    executable: /bin/bash
-
-
 - name: check pr_number
   fail:
     msg: "pr_number not set"
