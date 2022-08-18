@@ -70,6 +70,9 @@ steps:
         echo "aws_secret_access_key = $(jq -r .Credentials.SecretAccessKey ${tmp_file})" >> ~/.aws/config
         echo "aws_session_token = $(jq -r .Credentials.SessionToken ${tmp_file})" >> ~/.aws/config
 
+        expiry=$(jq -r .Credentials.Expiration ${tmp_file})
+        echo "##vso[task.setvariable variable=ASSUME_ROLE_EXPIRY;]$expiry"
+
         rm ${tmp_file}
 
         profile="${{ parameters.profile }}"
