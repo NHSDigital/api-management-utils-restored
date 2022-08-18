@@ -7,7 +7,6 @@ steps:
         parameters:
           role: "auto-ops"
           profile: "apm_ptl"
-        # condition: or(eq(parameters.retry, '0'), eq(variables['has_aws_role_timedout'], 'true'))
 
       - bash: |
           export retain_hours=72
