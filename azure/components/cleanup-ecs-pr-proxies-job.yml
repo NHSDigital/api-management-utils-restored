@@ -9,7 +9,7 @@ steps:
           profile: "apm_ptl"
 
       - bash: |
-          export retain_hours=72
+          export retain_hours=24
           ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys > /tmp/err.txt
           ERROR_CODE=$?
           ROLE_TIMEOUT_MSG="The AWS assume role session token is due to expire"
