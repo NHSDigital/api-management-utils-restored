@@ -9,6 +9,7 @@ steps:
           profile: "apm_ptl"
 
       - bash: |
+          make remove-stale-locks
           export retain_hours=72
           ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys > /tmp/err.txt
           ERROR_CODE=$?
