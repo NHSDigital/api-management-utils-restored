@@ -11,6 +11,15 @@ schedules:
         - master
     always: true
 
+parameters:
+  - name: retries
+    type: object
+    default:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+
 jobs:
   - job: build
     displayName: Cleanup ECS PR Proxies
@@ -35,11 +44,6 @@ jobs:
           echo working directory: $(System.DefaultWorkingDirectory)
         displayName: print aws info
 
-      - template: ./components/aws-assume-role.yml
-        parameters:
-          role: "auto-ops"
-          profile: "apm_ptl"
-
       - bash: |
           tfenv use 0.14.6
         displayName: setup terraform
@@ -48,7 +52,14 @@ jobs:
           make install
         displayName: install dependencies
 
+      - ${{ each retry in parameters.retries }}:
+        - template: ./components/cleanup-ecs-pr-proxies-job.yml
+          parameters:
+            retry: '${{ retry }}'
+
       - bash: |
-          export retain_hours=72
-          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys
-        displayName: "cleanup older pr deploys"
+          echo "AWS role session has timed out after multiple retries"
+          exit -1
+        displayName: Trigger failure if role has timed out
+        condition: eq(variables['has_aws_role_timedout'], 'true')
+

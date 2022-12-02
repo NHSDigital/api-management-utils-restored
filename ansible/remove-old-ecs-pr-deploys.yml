@@ -7,6 +7,13 @@
     account:  "ptl"
     APIGEE_ENVIRONMENT: "internal-dev"
     aws_profile: "apm_{{ account }}"
+    ASSUME_ROLE_EXPIRY: "{{ lookup('env', 'ASSUME_ROLE_EXPIRY') }}"
+
+  pre_tasks:
+    - name: check ASSUME_ROLE_EXPIRY
+      fail:
+        msg: "ASSUME_ROLE_EXPIRY not set"
+      when: not ASSUME_ROLE_EXPIRY
 
   roles:
     - setup-facts
