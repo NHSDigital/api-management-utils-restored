@@ -3,6 +3,9 @@ Script to force unlock locks in terraform with a given prefix and of a certain a
 
 Warning this script should be used with care.
 
+This script has to be used because sometimes the ecs pr pipeline cleanup won't always properly release the lock when
+it fails.
+
 CLI arguments:
     --min-age-hr
     --key-prefix
