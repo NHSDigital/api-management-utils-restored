@@ -40,3 +40,6 @@ endif
 
 ansible: guard-cmd
 	@account=$(account) poetry run make --no-print-directory -C ansible $(cmd)
+
+remove-stale-locks:
+	@poetry run python ./scripts/terraform_force_unlock.py
