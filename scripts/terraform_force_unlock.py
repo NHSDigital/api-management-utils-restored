@@ -18,6 +18,7 @@ python ./terraform_force_unlock.py --min-age-hr=8 --key-prefix=nhsd-apm-manageme
 
 """
 
+import json
 import boto3
 import dateutil
 import datetime
@@ -42,14 +43,14 @@ def main(min_age_hr, key_prefix, table_name, profile):
 
     ExpressionAttributeNames = {"#n0": "LockID", "#n1": "Info"}
     ExpressionAttributeValues = {
-        ":v0": "nhsd-apm-management-ptl-terraform/env:/api-deployment:ptl:"
+        ":v0": key_prefix,
     }
     items = terraform_lock_table.scan(FilterExpression=filter_expr, ExpressionAttributeNames=ExpressionAttributeNames, ExpressionAttributeValues=ExpressionAttributeValues)
     print(f"Found {len(items['Items'])} locks which start with key prefix '{key_prefix}'")
 
     removed_count = 0
     for lock_item in items["Items"]:
-        lock_item_info = lock_item["Info"]
+        lock_item_info = json.loads(lock_item["Info"])
         lock_id = lock_item["LockID"]
         created_at = dateutil.parser.parse(lock_item_info["Created"])
 
