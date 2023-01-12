@@ -22,10 +22,9 @@ steps:
         aws_role="$(ROLE)"
         echo "assume role: '${aws_role}'"
 
-        aws_account="${{ parameters.aws_account }}"
-        if [[ "${aws_account}" == "prod" ]]; then
-            echo "account is prod"
-            account_id="$(aws ssm get-parameter --name /account-ids/prod --query Parameter.Value --output text)"
+        if [[ "${{ parameters.aws_account }}" =~ ^(prod|dev)$ ]]; then
+            echo "account is ${{ parameters.aws_account }}"
+            account_id="$(aws ssm get-parameter --name /account-ids/${{ parameters.aws_account }} --query Parameter.Value --output text)"
             aws_role="arn:aws:iam::${account_id}:role/${aws_role}"
         fi
 
