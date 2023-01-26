@@ -1,2 +1,2 @@
-retain_hours:  "{{ (lookup('env', 'retain_hours') or 72) }}"
+retain_hours:  "{{ (lookup('env', 'retain_hours') or 48) }}"
 target_service_id: "{{ lookup('env', 'target_service_id') or '' }}"
