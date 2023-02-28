@@ -19,11 +19,6 @@
           ).total_seconds()
         ) < ( 1500 | int)
 
-- name : FAIL ON PURPOSE
-  fail:
-    msg: FAIL
-  when: true
-
 - name: check api_environment
   fail:
     msg: "unsupport API environment {{ apigee_environment }}"
