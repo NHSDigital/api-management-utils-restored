@@ -13,6 +13,7 @@ steps:
           export retain_hours=72
           ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys | tee /tmp/output.txt
           ERROR_CODE=$?
+          echo ERROR_CODE - $ERROR_CODE
           ROLE_TIMEOUT_MSG="The AWS assume role session token is due to expire"
           if grep -q "$ROLE_TIMEOUT_MSG" /tmp/output.txt ; then
             echo "stderr for ansible has the error \"$ROLE_TIMEOUT_MSG\""
