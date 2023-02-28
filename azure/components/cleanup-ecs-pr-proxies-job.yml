@@ -16,10 +16,9 @@ steps:
           echo ERROR_CODE - $ERROR_CODE
 
           if [ $ERROR_CODE -ne 0 ] ; then 
-            echo "\n\nansible has unhandled error, re-raising"
+            echo "\n\nansible has unhandled error, re-trying"
             echo "##vso[task.setvariable variable=should_retry;]true"
-            
-            exit -1
+
           else
             echo "##vso[task.setvariable variable=should_retry;]false"
           fi

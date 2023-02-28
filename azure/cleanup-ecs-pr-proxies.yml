@@ -47,6 +47,13 @@ jobs:
       - bash: |
           tfenv use 0.14.6
         displayName: setup terraform
+      
+      - task: s3-cache-action@1
+        inputs:
+          key: poetry | utils | poetry.lock
+          location: ".venv"
+          debug: true
+        displayName: cache utils pre-requisites 
 
       - bash: |
           make install
