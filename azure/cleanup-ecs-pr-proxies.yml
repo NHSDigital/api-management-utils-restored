@@ -61,5 +61,5 @@ jobs:
           echo "AWS role session has timed out after multiple retries"
           exit -1
         displayName: Trigger failure if role has timed out
-        condition: eq(variables['has_aws_role_timedout'], 'true')
+        condition: eq(variables['should_retry'], 'true')
 
