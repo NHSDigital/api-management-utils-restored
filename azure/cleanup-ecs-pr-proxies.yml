@@ -4,7 +4,7 @@ trigger: none
 pr: none
 
 schedules:
-  - cron: "0 2 * * *"
+  - cron: "0 */4 * * *" # Every 4 hours
     displayName: Daily PR cleanup
     branches:
       include:
@@ -47,6 +47,13 @@ jobs:
       - bash: |
           tfenv use 0.14.6
         displayName: setup terraform
+      
+      - task: s3-cache-action@1
+        inputs:
+          key: poetry | utils | poetry.lock
+          location: ".venv"
+          debug: true
+        displayName: cache utils pre-requisites 
 
       - bash: |
           make install
@@ -61,5 +68,5 @@ jobs:
           echo "AWS role session has timed out after multiple retries"
           exit -1
         displayName: Trigger failure if role has timed out
-        condition: eq(variables['has_aws_role_timedout'], 'true')
+        condition: eq(variables['should_retry'], 'true')
 
