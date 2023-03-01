@@ -10,7 +10,7 @@ steps:
 
       - bash: |
           make remove-stale-locks
-          export retain_hours=72
+          export retain_hours=48
           ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys
           ERROR_CODE=$?
           echo ERROR_CODE - $ERROR_CODE
