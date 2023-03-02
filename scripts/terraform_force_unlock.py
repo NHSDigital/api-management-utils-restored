@@ -26,7 +26,7 @@ import click
 
 
 @click.command()
-@click.option("--min-age-hr", type=int, default=8)
+@click.option("--min-age-hr", type=int, default=4)
 @click.option("--key-prefix", type=str, default="nhsd-apm-management-ptl-terraform/env:/api-deployment:ptl:")
 @click.option("--table-name", type=str, default="terraform-state-lock")
 @click.option("--profile", type=str, default="apm_ptl")

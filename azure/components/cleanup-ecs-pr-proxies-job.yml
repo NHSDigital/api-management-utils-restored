@@ -3,25 +3,27 @@ parameters:
     type: string
 
 steps:
-      - template: ./aws-assume-role.yml
-        parameters:
-          role: "auto-ops"
-          profile: "apm_ptl"
+  - template: ./aws-assume-role.yml
+    parameters:
+      role: "auto-ops"
+      profile: "apm_ptl"
 
-      - bash: |
-          make remove-stale-locks
-          export retain_hours=24
-          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys
-          ERROR_CODE=$?
-          echo ERROR_CODE - $ERROR_CODE
+  - bash: make remove-stale-locks
+    displayName: Remove stale locks
 
-          if [ $ERROR_CODE -ne 0 ] ; then 
-            echo "\n\nansible has unhandled error, re-trying"
-            echo "##vso[task.setvariable variable=should_retry;]true"
+  - bash: |
+      export retain_hours=72
+      ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys
+      ERROR_CODE=$?
+      echo ERROR_CODE - $ERROR_CODE
 
-          else
-            echo "##vso[task.setvariable variable=should_retry;]false"
-          fi
+      if [ $ERROR_CODE -ne 0 ] ; then 
+        echo "\n\nansible has unhandled error, re-trying"
+        echo "##vso[task.setvariable variable=should_retry;]true"
 
-        displayName: "cleanup older pr deploys"
-        condition: or(eq( ${{ parameters.retry }}, '0'), eq(variables['should_retry'], 'true'))
+      else
+        echo "##vso[task.setvariable variable=should_retry;]false"
+      fi
+
+    displayName: cleanup older pr deploys
+    condition: or(eq( ${{ parameters.retry }}, '0'), eq(variables['should_retry'], 'true'))
