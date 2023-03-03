@@ -19,6 +19,9 @@ parameters:
       - "1"
       - "2"
       - "3"
+  - name: retain_hours
+    type: string
+    default: "72"
 
 jobs:
   - job: build
@@ -63,6 +66,7 @@ jobs:
         - template: ./components/cleanup-ecs-pr-proxies-job.yml
           parameters:
             retry: '${{ retry }}'
+            retain_hours: '${{ parameters.retain_hours }}'
 
       - bash: |
           echo "AWS role session has timed out after multiple retries"
