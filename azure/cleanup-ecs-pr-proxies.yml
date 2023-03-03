@@ -14,12 +14,14 @@ schedules:
 parameters:
   - name: retries
     type: object
+    displayName: Retries
     default:
       - "0"
       - "1"
       - "2"
       - "3"
   - name: retain_hours
+    displayName: Retain hours
     type: string
     default: "72"
 
