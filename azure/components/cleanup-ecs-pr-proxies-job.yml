@@ -1,30 +1,31 @@
 parameters:
   - name: retry
     type: string
+  - name: retain_hours
+    type: string
 
 steps:
-      - template: ./aws-assume-role.yml
-        parameters:
-          role: "auto-ops"
-          profile: "apm_ptl"
+  - template: ./aws-assume-role.yml
+    parameters:
+      role: "auto-ops"
+      profile: "apm_ptl"
 
-      - bash: |
-          make remove-stale-locks
-          export retain_hours=72
-          ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys | tee /tmp/output.txt
-          ERROR_CODE=$?
-          ROLE_TIMEOUT_MSG="The AWS assume role session token is due to expire"
-          if grep -q "$ROLE_TIMEOUT_MSG" /tmp/output.txt ; then
-            echo "stderr for ansible has the error \"$ROLE_TIMEOUT_MSG\""
-            echo "Re-assuming role and re-running step"
-            echo "##vso[task.setvariable variable=has_aws_role_timedout;]true"
+  - bash: make remove-stale-locks
+    displayName: Remove stale locks
 
-          elif [ $ERROR_CODE -ne 0 ] ; then 
-            echo "\n\nansible has unhandled error, re-raising"
-            exit -1
-          else
-            echo "##vso[task.setvariable variable=has_aws_role_timedout;]false"
-          fi
+  - bash: |
+      export retain_hours="${{ parameters.retain_hours }}"
+      ANSIBLE_FORCE_COLOR=yes make -C ansible remove-old-ecs-pr-deploys
+      ERROR_CODE=$?
+      echo ERROR_CODE - $ERROR_CODE
 
-        displayName: "cleanup older pr deploys"
-        condition: or(eq( ${{ parameters.retry }}, '0'), eq(variables['has_aws_role_timedout'], 'true'))
+      if [ $ERROR_CODE -ne 0 ] ; then 
+        echo "\n\nansible has unhandled error, re-trying"
+        echo "##vso[task.setvariable variable=should_retry;]true"
+
+      else
+        echo "##vso[task.setvariable variable=should_retry;]false"
+      fi
+
+    displayName: cleanup older pr deploys
+    condition: or(eq( ${{ parameters.retry }}, '0'), eq(variables['should_retry'], 'true'))
