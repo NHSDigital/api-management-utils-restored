@@ -21,7 +21,7 @@ steps:
       set -euo pipefail
       echo "!!! If you get an error here, it is because '${{ parameters.service_name }}' is not the source alias name of the artifact"
       ls -R $(Pipeline.Workspace)
-      export SERVICE_ARTIFACT_NAME=`ls $(Pipeline.Workspace)/s/${{ parameters.service_name }}`
+      export SERVICE_ARTIFACT_NAME=`ls -t $(Pipeline.Workspace)/s/${{ parameters.service_name }}`
       echo "##vso[task.setvariable variable=SERVICE_ARTIFACT_NAME]$SERVICE_ARTIFACT_NAME"
       echo "Set Artifact Name of: $SERVICE_ARTIFACT_NAME"
     displayName: 'Set SERVICE_ARTIFACT_NAME'
