@@ -19,6 +19,8 @@
     DEPLOYED_VERSION: "{{ lookup('env', 'DEPLOYED_VERSION') }}"
     RELEASE_RELEASEID: "{{ lookup('env', 'RELEASE_RELEASEID') }}"
     SOURCE_COMMIT_ID: "{{ lookup('env', 'SOURCE_COMMIT_ID') }}"
+    HOSTED_TARGET_CONNECTION_PATH_SUFFIX: "{{ lookup('env', 'HOSTED_TARGET_CONNECTION_PATH_SUFFIX') }}"
+    HOSTED_TARGET_HEALTHCHECK_SUFFIX: "{{ lookup('env', 'HOSTED_TARGET_HEALTHCHECK_SUFFIX') }}"
     HOSTED_TARGET_CONNECTION: |
           <SSLInfo>
             <Enabled>true</Enabled>
