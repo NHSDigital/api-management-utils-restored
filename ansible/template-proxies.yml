@@ -36,7 +36,7 @@
       <LoadBalancer>
         <Server name="hosted-apis"/>
       </LoadBalancer>
-      <Path>/{{ service_id }}{{ '-' + pr_number if pr_number else '' }}{{ HOSTED_TARGET_HEALTHCHECK_SUFFIX | default('/_status') }}</Path>
+      <Path>/{{ service_id }}{{ '-' + pr_number if pr_number else '' }}{{ HOSTED_TARGET_HEALTHCHECK_SUFFIX | default('') }}</Path>
    
 
   roles:
