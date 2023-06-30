@@ -33,7 +33,7 @@ parameters:
     default: ''
   - name: hosted_target_healthcheck_suffix
     type: string
-    default: ''
+    default: '/_status'
   - name: jinja_templates
     type: object
     displayName:  Key/values for custom jinja templating

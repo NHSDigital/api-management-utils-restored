@@ -52,7 +52,7 @@ parameters:
     default: ''
   - name: hosted_target_healthcheck_suffix
     type: string
-    default: ''
+    default: '/_status'
   - name: manual_approval_env
     type: string
 
