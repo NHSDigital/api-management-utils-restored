@@ -212,7 +212,7 @@ jobs:
 
       - bash: |
           tfenv use 0.14.6
-        displayName: use terraforn
+        displayName: use terraform
         condition: and(succeeded(), eq(variables['build_containers'], 'true'))
 
       - bash: |

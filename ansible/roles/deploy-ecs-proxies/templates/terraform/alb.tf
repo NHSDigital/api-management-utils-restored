@@ -18,14 +18,14 @@ resource "aws_alb_target_group" "service" {
 }
 
 resource "aws_lb_listener_rule" "service" {
-  listener_arn = data.terraform_remote_state.pre-reqs.outputs.private_alb_listener_arn
-
+  listener_arn = local.private_alb_listener_arns[
+    parseint(md5(local.short_env_namespaced_name), 16) % local.private_alb_listener_count
+  ]
   action {
     order            = 1
     target_group_arn = aws_alb_target_group.service.arn
     type             = "forward"
   }
-
   condition {
     http_header {
       http_header_name = "X-APIM-Service"
