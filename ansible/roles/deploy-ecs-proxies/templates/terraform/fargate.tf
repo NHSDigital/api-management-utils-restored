@@ -91,8 +91,6 @@ resource "aws_appautoscaling_target" "ecs_target" {
 
 resource "aws_appautoscaling_policy" "ecs_policy" {
 
-  count = var.autoscaling_enabled ? 1 : 0
-
   name               = local.short_env_namespaced_name
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
