@@ -63,7 +63,7 @@ locals {
   private_alb_listener_count = data.terraform_remote_state.pre-reqs.outputs.private_alb_listener_count
 
   autoscaling_resource_labels =  [
-    for suffix in private_alb_arn_suffixes : (
+    for suffix in data.terraform_remote_state.pre-reqs.outputs.private_alb_arn_suffixes : (
       var.autoscaling_enabled && var.autoscaling_service_metric == "ALBRequestCountPerTarget" ? "${suffix}/${aws_alb_target_group.service.arn_suffix}"
       : "")]
 }
