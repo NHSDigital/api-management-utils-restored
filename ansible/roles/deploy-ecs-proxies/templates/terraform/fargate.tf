@@ -108,5 +108,5 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
     scale_in_cooldown = var.autoscaling_scale_in_cooldown
     target_value = var.autoscaling_target_value
   }
-  for_each = toset(local.autoscaling_resource_labels)
+  for_each = var.autoscaling_enabled ? toset(local.autoscaling_resource_labels) : toset([])
 }
