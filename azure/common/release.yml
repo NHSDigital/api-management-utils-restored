@@ -60,6 +60,8 @@ parameters:
   - name: producer_approval
     type: boolean
     default: false
+  - name: build_pipeline_name
+    type: string
 
 stages:
   - ${{ if eq(parameters.environment, 'manual-approval') }}:

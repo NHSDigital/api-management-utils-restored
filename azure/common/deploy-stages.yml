@@ -14,8 +14,8 @@ parameters:
     type: string
   - name: prod_producer_approval
     type: boolean
-
-
+  - name: build_pipeline_name
+    type: string
 
 stages:
   - ${{ each apigee_deployment in parameters.apigee_deployments }}:

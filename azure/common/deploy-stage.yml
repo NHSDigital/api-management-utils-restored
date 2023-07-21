@@ -49,6 +49,9 @@ parameters:
   - name: notify
     type: boolean
     default: false
+  - name: condition
+    type: string
+    default: 'always()'
   - name: enable_monitoring
     type: boolean
   - name: enable_status_monitoring
@@ -56,6 +59,8 @@ parameters:
   - name: hosted_target_connection_path_suffix
     type: string
   - name: hosted_target_healthcheck_suffix
+    type: string
+  - name: build_pipeline_name
     type: string
   - name: _expose_blacklist
     type: object
@@ -74,6 +79,7 @@ parameters:
 stages:
   - stage: ${{ parameters.stage_name }}
     dependsOn: ${{ parameters.depends_on }}
+    condition: ${{ parameters.condition }}
     jobs:
       - deployment: deploy
         environment: ${{ parameters.environment }}
@@ -97,8 +103,8 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   inputs:
                     source: "specific"
-                    project: $(resources.pipeline.build_pipeline.projectID)
-                    pipeline: $(resources.pipeline.build_pipeline.pipelineID)
+                    project: $(resources.pipeline.${{ parameters.build_pipeline_name }}.projectID)
+                    pipeline: $(resources.pipeline.${{ parameters.build_pipeline_name }}.pipelineID)
                     preferTriggeringPipeline: true
                     runVersion: "latestFromBranch"
                     runBranch: $(Build.SourceBranch)

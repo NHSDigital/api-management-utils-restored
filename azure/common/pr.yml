@@ -55,6 +55,8 @@ parameters:
     default: '/_status'
   - name: manual_approval_env
     type: string
+  - name: build_pipeline_name
+    type: string
 
 stages:
   - ${{ if eq(parameters.environment, 'manual-approval') }}:

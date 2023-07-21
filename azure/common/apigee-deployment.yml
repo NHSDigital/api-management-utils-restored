@@ -86,6 +86,9 @@ parameters:
     displayName: Custom manual approval env overwrite
     type: string
     default: 'manual-approval'
+  - name: build_pipeline_name
+    type: string
+    default: build_pipeline
   - name: _scoped_pipeline_vars
     type: object
     displayName: All the pipeline parameters which support per-environment scoping.
