@@ -89,10 +89,7 @@ resource "aws_appautoscaling_target" "ecs_target" {
   service_namespace  = "ecs"
 }
 
-
 resource "aws_appautoscaling_policy" "ecs_policy" {
-
-  count = var.autoscaling_enabled ? 1 : 0
 
   name               = local.short_env_namespaced_name
   policy_type        = "TargetTrackingScaling"
@@ -103,10 +100,11 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = var.autoscaling_service_metric
-      resource_label = local.autoscaling_resource_label
+      resource_label = each.key
     }
     scale_out_cooldown = var.autoscaling_scale_out_cooldown
     scale_in_cooldown = var.autoscaling_scale_in_cooldown
     target_value = var.autoscaling_target_value
   }
+  for_each = var.autoscaling_enabled ? toset(local.autoscaling_resource_labels) : toset([])
 }

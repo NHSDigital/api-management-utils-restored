@@ -3,12 +3,16 @@ output "vpc_id" {
   value = data.terraform_remote_state.account.outputs.account_vpc.id
 }
 
-output "private_alb_listener_arn" {
-  value = local.private_alb_listener.arn
+output "private_alb_listener_arns" {
+  value = [for listener in local.private_alb_listeners : listener.arn]
 }
 
-output "private_alb_arn_suffix" {
-  value = local.private_alb.arn_suffix
+output "private_alb_listener_count" {
+  value = data.terraform_remote_state.account.outputs.apis.alb-listener-count
+}
+
+output "private_alb_arn_suffixes" {
+  value = [for alb in local.private_albs : alb.arn_suffix]
 }
 
 output "subnet_ids" {
