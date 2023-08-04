@@ -58,10 +58,12 @@ locals {
 
   exposed_service = element(matchkeys(local.ecs_service, local.ecs_service.*.expose, list(true)), 0)
 
-  private_alb_arn_suffix = data.terraform_remote_state.pre-reqs.outputs.private_alb_arn_suffix
+  private_alb_arn_suffixes = data.terraform_remote_state.pre-reqs.outputs.private_alb_arn_suffixes
+  private_alb_listener_arns = data.terraform_remote_state.pre-reqs.outputs.private_alb_listener_arns
+  private_alb_listener_count = data.terraform_remote_state.pre-reqs.outputs.private_alb_listener_count
 
-  autoscaling_resource_label =  (
-    var.autoscaling_enabled && var.autoscaling_service_metric == "ALBRequestCountPerTarget" ?
-      "${local.private_alb_arn_suffix}/${aws_alb_target_group.service.arn_suffix}" : ""
-  )
+  autoscaling_resource_labels =  [
+    for suffix in data.terraform_remote_state.pre-reqs.outputs.private_alb_arn_suffixes : (
+      var.autoscaling_enabled && var.autoscaling_service_metric == "ALBRequestCountPerTarget" ? "${suffix}/${aws_alb_target_group.service.arn_suffix}"
+      : "")]
 }

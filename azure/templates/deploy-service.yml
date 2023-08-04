@@ -69,13 +69,13 @@ steps:
     workingDirectory: "$(SERVICE_DIR)"
     displayName: "Check for ECS proxy definitions"
 
-  - task: s3-cache-action@1
-    inputs:
-      key: poetry | utils | $(UTILS_DIR)/poetry.lock
-      location: "$(UTILS_DIR)/.venv"
-      debug: true
-      alias: 'UtilsPreReq'
-    displayName: cache utils pre-requisites
+  # - task: s3-cache-action@1
+  #   inputs:
+  #     key: poetry | utils | $(UTILS_DIR)/poetry.lock
+  #     location: "$(UTILS_DIR)/.venv"
+  #     debug: true
+  #     alias: 'UtilsPreReq'
+  #   displayName: cache utils pre-requisites
 
   - bash: |
       n=0
@@ -85,7 +85,7 @@ steps:
         n=$((n+1))
       done
     workingDirectory: "$(UTILS_DIR)"
-    condition: ne(variables['CacheRestored-UtilsPreReq'], 'true')
+    # condition: ne(variables['CacheRestored-UtilsPreReq'], 'true')
     displayName: "Install utils pre-requisites"
 
   - bash: |
