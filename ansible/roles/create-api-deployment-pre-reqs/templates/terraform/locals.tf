@@ -12,9 +12,8 @@ locals {
   short_env_service_namespaces = [for ns in local.service_namespaces : "${var.apigee_shortenv}-${ns}"]
   workspaces             = contains(["internal-dev", "internal-dev-sandbox"], var.apigee_environment) ? [var.workspace, "${var.workspace}:*"] : [var.workspace]
 
-
-  private_alb_listener = data.terraform_remote_state.account.outputs.apis.alb-listener.private[var.apigee_environment]
-  private_alb          = data.terraform_remote_state.account.outputs.apis.alb.private[var.apigee_environment]
+  private_alb_listeners = data.terraform_remote_state.account.outputs.apis.alb-listener.private[var.apigee_environment]
+  private_albs          = data.terraform_remote_state.account.outputs.apis.alb.private[var.apigee_environment]
   ecs_cluster         = data.terraform_remote_state.account.outputs.apis.ecs_clusters[var.apigee_environment]
   apis_subdomain      = data.terraform_remote_state.account.outputs.apis.apis_subdomain
 
