@@ -1,6 +1,3 @@
-import requests
-import json
-import bisect
 import copy
 
 from ansible_collections.nhsd.apigee.plugins.module_utils.models.ansible.add_jwks_resource_url import (
@@ -13,7 +10,6 @@ from ansible_collections.nhsd.apigee.plugins.module_utils import utils
 from ansible_collections.nhsd.apigee.plugins.module_utils import constants
 
 ATTRIBUTE_NAME = "jwks-resource-url"
-DEVELOPER_DETAILS = "APIGEE_DEVELOPER_DETAILS"
 
 
 class ActionModule(ApigeeAction):
