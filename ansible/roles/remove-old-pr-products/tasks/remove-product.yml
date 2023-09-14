@@ -42,7 +42,7 @@
 - block:
   - name: "remove product apps {{ product_slug }}"
     uri:
-      url: "{{ developers_uri }}/{{ dev_id_to_email[item.developerId] }}/apps/{{ item.appName | urlencode }}/keys/{{ item.consumerKey }}/apiproducts/{{ product_slug }}"
+      url: "{{ org_uri }}/{{ item.ownerEndpoint }}/{{ item.owner }}/apps/{{ item.appName | urlencode }}/keys/{{ item.consumerKey }}/apiproducts/{{ product_slug }}"
       method: DELETE
       headers:
         Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"

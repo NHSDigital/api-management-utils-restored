@@ -25,11 +25,21 @@ def apigee_apps_to_product_map(apps_list: List[dict], product_filter: str = None
                 if api_product not in result:
                     result[api_product] = []
 
+                company_exists = "companyName" in app.keys()
+                developer_exists = "developerId" in app.keys()
+                if developer_exists and not company_exists:
+                    owner = app["developerId"]
+                elif company_exists and not developer_exists:
+                    owner = app["companyName"]
+                else:
+                    raise RuntimeError(f"Invalid owner for app {app['appId']}")
+
                 result[api_product].append(
                     dict(
                         appId=app["appId"],
                         appName=app["name"],
-                        developerId=app["developerId"],
+                        owner=owner,
+                        ownerEndpoint="companies" if company_exists else "developers",
                         consumerKey=cred["consumerKey"],
                         apiproduct=api_product
                      )

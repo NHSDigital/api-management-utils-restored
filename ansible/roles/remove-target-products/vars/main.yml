@@ -1,5 +1,4 @@
 org_uri: "https://api.enterprise.apigee.com/v1/organizations/{{ APIGEE_ORG }}"
 products_uri: "{{ org_uri }}/apiproducts"
 apps_uri: "{{ org_uri }}/apps"
-developers_uri: "{{ org_uri }}/developers"
 force_remove_from_apps: "{{ lookup('env', 'force_remove_from_apps') }}"
