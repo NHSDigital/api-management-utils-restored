@@ -1,4 +1,3 @@
-import collections
 import re
 from typing import List
 
@@ -75,15 +74,20 @@ def apigee_remove_proxy_from_product(product: dict, proxy_to_remove):
     return product
 
 
-def apigee_teams_map(teamMembers: List[dict], teams: List[dict]):
-    joined = collections.defaultdict(dict)
-    for item in teamMembers + teams:
+def apigee_team_to_admin(team):
+    return next((attr.get('value') for attr in team['attributes'] if attr['name'] == 'ADMIN_EMAIL'), None)
+
+
+def apigee_teams_map(team_members: List[dict], teams: List[dict]):
+    from collections import defaultdict
+    joined = defaultdict(dict)
+    for item in team_members + teams:
         joined[item['name']].update(item)
     full_teams = list(joined.values())
 
     return {
         team['name']: {
-            "contact": next((attr.get('value') for attr in team['attributes'] if attr['name'] == 'ADMIN_EMAIL'), {}),
+            "contact": apigee_team_to_admin(team),
             "members": team['members']
         }
         for team in full_teams
@@ -91,11 +95,7 @@ def apigee_teams_map(teamMembers: List[dict], teams: List[dict]):
 
 
 def apigee_teams_to_point_of_contact(teams: List[dict]):
-
-    return {
-        next((attr.get('value') for attr in team['attributes'] if attr['name'] == 'ADMIN_EMAIL'), {})
-        for team in teams
-    }
+    return {apigee_team_to_admin(team) for team in teams}
 
 
 def apigee_teams_to_members(teams: List[dict]):
