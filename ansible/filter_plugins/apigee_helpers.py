@@ -49,6 +49,13 @@ def apigee_apps_to_product_map(apps_list: List[dict], product_filter: str = None
     return result
 
 
+def product_app_mapping_to_owner_display(dev_id_to_email: dict, product_app: dict):
+    if product_app['ownerEndpoint'] == 'developers':
+        return dev_id_to_email[product_app['owner']]
+    else:
+        return product_app['owner']
+
+
 def apigee_products_to_api_map(products: List[dict], proxy_filter: str = None):
 
     result = dict()
@@ -164,5 +171,6 @@ class FilterModule:
             'apigee_teams_to_point_of_contact': apigee_teams_to_point_of_contact,
             'apigee_teams_to_members': apigee_teams_to_members,
             'apigee_teams_map': apigee_teams_map,
-            'apigee_product_developers': apigee_product_developers
+            'apigee_product_developers': apigee_product_developers,
+            'product_app_mapping_to_owner_display': product_app_mapping_to_owner_display
         }
