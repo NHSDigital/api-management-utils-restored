@@ -83,28 +83,34 @@ def apigee_remove_proxy_from_product(product: dict, proxy_to_remove):
     return product
 
 
-def apigee_teams_map(teams: List[dict]):
+def apigee_team_to_admin(team):
+    return next((attr.get('value') for attr in team['attributes'] if attr['name'] == 'ADMIN_EMAIL'), None)
+
+
+def apigee_teams_map(team_members: List[dict], teams: List[dict]):
+    from collections import defaultdict
+    joined = defaultdict(dict)
+    for item in team_members + teams:
+        joined[item['name']].update(item)
+    full_teams = list(joined.values())
 
     return {
-        f"{team['id']}@devteam.apigee.io": {
-            "contact": team['pointOfContact'],
-            "members": list(mem['userId'] for mem in team.get('memberships', []))
+        team['name']: {
+            "contact": apigee_team_to_admin(team),
+            "members": team['members']
         }
-        for team in teams
+        for team in full_teams
     }
 
 
 def apigee_teams_to_point_of_contact(teams: List[dict]):
-
-    return {
-        f"{team['id']}@devteam.apigee.io": team['pointOfContact'] for team in teams
-    }
+    return {apigee_team_to_admin(team) for team in teams}
 
 
 def apigee_teams_to_members(teams: List[dict]):
 
     return {
-        f"{team['id']}@devteam.apigee.io": list(mem['userId'] for mem in team.get('memberships', [])) for team in teams
+        team['owner']: team.get('members', []) for team in teams
     }
 
 
@@ -126,18 +132,16 @@ def apigee_product_developers(
             result[product_name] = []
 
         for app in apps:
-            developer = dev_id_to_email[app["developerId"]]
-
-            team = teams_map.get(developer, {})
-
             entry = {
-                "app": app["appName"],
-                "developer": developer
+                "app": app["appName"]
             }
 
-            if team:
+            if app['ownerEndpoint'] == 'companies':
+                team = teams_map.get(app.get("owner"), {})
                 entry['developer'] = team['contact']
                 entry['team'] = team['members']
+            else:
+                entry['developer'] = dev_id_to_email[app["owner"]]
 
             result[product_name].append(entry)
 
@@ -146,10 +150,6 @@ def apigee_product_developers(
     }
 
     return result
-
-    # return {
-    #     f"{team['id']}@devteam.apigee.io": list(mem['userId'] for mem in team.get('memberships', [])) for team in teams
-    # }
 
 
 class FilterModule:

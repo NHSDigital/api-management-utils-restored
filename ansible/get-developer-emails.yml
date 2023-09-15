@@ -1,4 +1,4 @@
-- name: remove old pr portal apis
+- name: get developer emails
   hosts: 127.0.0.1
   connection: local
   gather_facts: yes
