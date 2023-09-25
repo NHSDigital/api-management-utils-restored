@@ -8,7 +8,6 @@ from ansible_collections.nhsd.apigee.plugins.module_utils.models.manifest.meta i
     SCHEMA_VERSION,
 )
 
-
 DIR = pathlib.Path(__file__).parent.absolute()
 
 MAJOR, MINOR, PATCH = [int(x) for x in SCHEMA_VERSION.split(".")]
@@ -21,6 +20,8 @@ def test_schema_version():
     """
 
     live_schema = Manifest.schema()
+    print(live_schema)
     with open(str(DIR) + f'/schema_versions/v{SCHEMA_VERSION}.json') as f:
+        print(json.load(f))
         recorded_schema = json.load(f)
     assert live_schema == recorded_schema
