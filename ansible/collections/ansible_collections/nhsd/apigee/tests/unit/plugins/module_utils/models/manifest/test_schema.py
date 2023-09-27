@@ -1,3 +1,4 @@
+import json
 import pathlib
 
 from ansible_collections.nhsd.apigee.plugins.module_utils.models.manifest.manifest import (
@@ -23,5 +24,5 @@ def test_schema_version():
     with open(str(DIR) + f'/schema_versions/v{SCHEMA_VERSION}.json') as f:
         print(SCHEMA_VERSION)
         print(f)
-        # recorded_schema = json.load(f)
-    # assert live_schema == recorded_schema
+        recorded_schema = json.load(f)
+    assert live_schema == recorded_schema
