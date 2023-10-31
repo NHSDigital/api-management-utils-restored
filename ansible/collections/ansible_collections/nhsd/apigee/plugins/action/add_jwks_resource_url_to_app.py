@@ -1,6 +1,3 @@
-import requests
-import json
-import bisect
 import copy
 
 from ansible_collections.nhsd.apigee.plugins.module_utils.models.ansible.add_jwks_resource_url import (
@@ -13,7 +10,6 @@ from ansible_collections.nhsd.apigee.plugins.module_utils import utils
 from ansible_collections.nhsd.apigee.plugins.module_utils import constants
 
 ATTRIBUTE_NAME = "jwks-resource-url"
-DEVELOPER_DETAILS = "APIGEE_DEVELOPER_DETAILS"
 
 
 class ActionModule(ApigeeAction):
@@ -39,49 +35,24 @@ class ActionModule(ApigeeAction):
         after["attributes"].append(jwks_attribute)
         after["attributes"] = sorted(after["attributes"], key=lambda attr: attr["name"])
 
-        developer_details = task_vars.get(DEVELOPER_DETAILS)
-        if not developer_details:
-            developer_details = []
-            params = {"expand": True}
-            url = (
-                constants.APIGEE_BASE_URL
-                + f"organizations/{args.organization}/developers"
-            )
-            while True:
-                resp = utils.get(url, args.access_token, params=params)
-                if resp.get("failed"):
-                    return resp
-                devs = resp["response"]["body"]["developer"]
-                developer_details.extend(devs)
-                if len(devs) == 1000:
-                    # last developer's ID as startKey will be included
-                    # in next request, so pop now to de-dupe.
-                    last_dev = developer_details.pop()
-                    params["startKey"] = last_dev["developerId"]
-                else:
-                    break
-
-        try:
-            developer_id = args._app_data["developerId"]
-            developer_ids = [d["developerId"] for d in developer_details]
-            i = bisect.bisect_left(developer_ids, developer_id)
-            if i == len(developer_details):
-                raise RuntimeError(f"Unable to find developer with id {developer_id}")
-        except RuntimeError as e:
-            return {"failed": True, "error": str(e)}
-        
-        developer = developer_details[i]
-
         delta = utils.delta(before, after)
         result = {
             "changed": bool(delta),
-            "app": after,
-            "developer": developer,
-            "ansible_facts": {DEVELOPER_DETAILS: developer_details},
+            "app": after
         }
 
+        company_exists = "companyName" in args._app_data.keys()
+        developer_exists = "developerId" in args._app_data.keys()
+        if developer_exists and not company_exists:
+            owner = args._app_data["developerId"]
+        elif company_exists and not developer_exists:
+            owner = args._app_data["companyName"]
+        else:
+            return {"failed": True, "error": f"Invalid owner for app {args._app_data['appId']}"}
+
+        owner_endpoint = "companies" if company_exists else "developers"
         app_name = args._app_data["name"]
-        app_path = f"organizations/{args.organization}/developers/{developer['email']}/apps/{app_name}/attributes"
+        app_path = f"organizations/{args.organization}/{owner_endpoint}/{owner}/apps/{app_name}/attributes"
 
         if diff_mode:
             result["diff"] = [
