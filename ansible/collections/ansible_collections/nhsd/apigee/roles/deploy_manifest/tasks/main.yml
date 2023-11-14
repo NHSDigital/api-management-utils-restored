@@ -72,4 +72,4 @@
   # See comment on product loop control. (I believe APIDocs
   # actually can reference products that don't exist. But this is
   # cleaner.)
-  when: item.edgeAPIProductName | regex_search('^' + SERVICE_NAME + '-' + PULL_REQUEST | default(APIGEE_ENVIRONMENT))
+  when: APIGEE_ORGANIZATION == 'nhsd-prod' and item.edgeAPIProductName | regex_search('^' + SERVICE_NAME + '-' + PULL_REQUEST | default(APIGEE_ENVIRONMENT))

@@ -100,11 +100,27 @@ def get_all_apidocs(organization, access_token, task_vars=None, refresh=False):
         task_vars = {}
     apidocs = task_vars.get("APIGEE_APIDOCS")
     if refresh or not apidocs:
-        apidocs_request = get(constants.portal_uri(organization), access_token)
-        if apidocs_request.get("failed"):
-            return apidocs_request
-        apidocs = apidocs_request["response"]["body"]["data"]
-        task_vars.update({"APIGEE_APIDOCS": apidocs})
+        all_results = []
+
+        params = {
+            "pageSize" : 100
+        }
+        scan = True
+
+        while scan:
+            apidocs_request = get(constants.portal_uri(organization), access_token, params=params)
+            if apidocs_request.get("failed"):
+                return apidocs_request
+
+            next_page_token = apidocs_request["response"]["body"]["next_page_token"]
+            all_results += apidocs_request["response"]["body"]["data"]
+
+            if next_page_token != "":
+                params["pageToken"] = next_page_token
+            else:
+                scan = False
+
+        task_vars.update({"APIGEE_APIDOCS": all_results})
     return task_vars
 
 
