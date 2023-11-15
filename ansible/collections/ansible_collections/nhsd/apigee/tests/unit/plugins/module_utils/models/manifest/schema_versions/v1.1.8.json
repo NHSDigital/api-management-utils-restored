@@ -1,0 +1,422 @@
+{
+    "title": "Manifest",
+    "type": "object",
+    "properties": {
+      "apigee": {
+        "$ref": "#/definitions/ManifestApigee"
+      },
+      "meta": {
+        "$ref": "#/definitions/ManifestMeta"
+      }
+    },
+    "required": ["apigee", "meta"],
+    "definitions": {
+      "ApigeeProductAttributeAccess": {
+        "title": "ApigeeProductAttributeAccess",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "enum": ["access"],
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "enum": ["public", "private"],
+            "type": "string"
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "ApigeeProductAttributeRateLimit": {
+        "title": "ApigeeProductAttributeRateLimit",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "enum": ["ratelimit"],
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "pattern": "^[0-9]+(ps|pm)$",
+            "type": "string"
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "QuotaConfig": {
+        "title": "QuotaConfig",
+        "description": "Providing default values for ratelimiting here would mean that\nchanging defaults required a redeploy for all proxies.\n\nTherefore we set None as the default value on all\nRateLimitingConfig attributes, and *do not* export them as JSON.\n\nThe platform defaults are used to fill in the missing values\ninside the ApplyRateLimiting shared flow.  This pattern us to\nupdate the defaults for everyone by just by updating the shared\nflow.",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "interval": {
+            "title": "Interval",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "limit": {
+            "title": "Limit",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "timeunit": {
+            "title": "Timeunit",
+            "enum": ["minute", "hour", "day", "week", "month"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SpikeArrestConfig": {
+        "title": "SpikeArrestConfig",
+        "description": "Providing default values for ratelimiting here would mean that\nchanging defaults required a redeploy for all proxies.\n\nTherefore we set None as the default value on all\nRateLimitingConfig attributes, and *do not* export them as JSON.\n\nThe platform defaults are used to fill in the missing values\ninside the ApplyRateLimiting shared flow.  This pattern us to\nupdate the defaults for everyone by just by updating the shared\nflow.",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "ratelimit": {
+            "title": "Ratelimit",
+            "pattern": "^[1-9][0-9]*(ps|pm)$",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RateLimitingConfig": {
+        "title": "RateLimitingConfig",
+        "description": "Providing default values for ratelimiting here would mean that\nchanging defaults required a redeploy for all proxies.\n\nTherefore we set None as the default value on all\nRateLimitingConfig attributes, and *do not* export them as JSON.\n\nThe platform defaults are used to fill in the missing values\ninside the ApplyRateLimiting shared flow.  This pattern us to\nupdate the defaults for everyone by just by updating the shared\nflow.",
+        "type": "object",
+        "properties": {
+          "quota": {
+            "$ref": "#/definitions/QuotaConfig"
+          },
+          "spikeArrest": {
+            "$ref": "#/definitions/SpikeArrestConfig"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApigeeProductAttributeRateLimiting": {
+        "title": "ApigeeProductAttributeRateLimiting",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "enum": ["ratelimiting"],
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/definitions/RateLimitingConfig"
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "ApigeeProductAttributeOther": {
+        "title": "ApigeeProductAttributeOther",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "pattern": "^(?!(access|ratelimit|ratelimiting)$)",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "ApigeeProduct": {
+        "title": "ApigeeProduct",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "approvalType": {
+            "title": "Approvaltype",
+            "default": "manual",
+            "enum": ["auto", "manual"],
+            "type": "string"
+          },
+          "attributes": {
+            "title": "Attributes",
+            "default": [
+              {
+                "name": "access",
+                "value": "private"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "oneOf": [
+                    {
+                      "$ref": "#/definitions/ApigeeProductAttributeAccess"
+                    },
+                    {
+                      "$ref": "#/definitions/ApigeeProductAttributeRateLimit"
+                    },
+                    {
+                      "$ref": "#/definitions/ApigeeProductAttributeRateLimiting"
+                    }
+                  ]
+                },
+                {
+                  "$ref": "#/definitions/ApigeeProductAttributeOther"
+                }
+              ]
+            }
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "displayName": {
+            "title": "Displayname",
+            "type": "string"
+          },
+          "environments": {
+            "title": "Environments",
+            "minItems": 1,
+            "maxItems": 1,
+            "type": "array",
+            "items": {
+              "enum": [
+                "internal-dev",
+                "internal-dev-sandbox",
+                "internal-qa",
+                "internal-qa-sandbox",
+                "ref",
+                "dev",
+                "sandbox",
+                "int",
+                "prod"
+              ],
+              "type": "string"
+            }
+          },
+          "proxies": {
+            "title": "Proxies",
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "quota": {
+            "title": "Quota",
+            "pattern": "[1-9][0-9]*",
+            "type": "string"
+          },
+          "quotaInterval": {
+            "title": "Quotainterval",
+            "pattern": "[1-9][0-9]*",
+            "type": "string"
+          },
+          "quotaTimeUnit": {
+            "title": "Quotatimeunit",
+            "enum": ["minute", "hour"],
+            "type": "string"
+          },
+          "scopes": {
+            "title": "Scopes",
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "environments"],
+        "additionalProperties": false
+      },
+      "ApigeeSpec": {
+        "title": "ApigeeSpec",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "format": "file-path",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "object"
+          }
+        },
+        "required": ["name", "path"],
+        "additionalProperties": false
+      },
+      "ApigeeApidoc": {
+        "title": "ApigeeApidoc",
+        "type": "object",
+        "properties": {
+          "edgeAPIProductName": {
+            "title": "Edgeapiproductname",
+            "type": "string"
+          },
+          "anonAllowed": {
+            "title": "Anonallowed",
+            "default": true,
+            "type": "boolean"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "requireCallbackUrl": {
+            "title": "Requirecallbackurl",
+            "default": false,
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "visibility": {
+            "title": "Visibility",
+            "default": false,
+            "type": "boolean"
+          },
+          "specId": {
+            "title": "Specid",
+            "default": "",
+            "type": "string"
+          },
+          "specContent": {
+            "title": "Speccontent",
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": ["edgeAPIProductName"],
+        "additionalProperties": false
+      },
+      "ManifestApigeeEnvironment": {
+        "title": "ManifestApigeeEnvironment",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "enum": [
+              "internal-dev",
+              "internal-dev-sandbox",
+              "internal-qa",
+              "internal-qa-sandbox",
+              "ref",
+              "dev",
+              "sandbox",
+              "int",
+              "prod"
+            ],
+            "type": "string"
+          },
+          "products": {
+            "title": "Products",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ApigeeProduct"
+            }
+          },
+          "specs": {
+            "title": "Specs",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ApigeeSpec"
+            }
+          }
+        },
+        "required": ["name"]
+      },
+      "ManifestApigee": {
+        "title": "ManifestApigee",
+        "type": "object",
+        "properties": {
+          "environments": {
+            "title": "Environments",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ManifestApigeeEnvironment"
+            }
+          }
+        },
+        "required": ["environments"]
+      },
+      "ManifestMetaApi": {
+        "title": "ManifestMetaApi",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "description": "This field is deprecated, use guid instead.",
+            "type": "string",
+            "format": "uuid4"
+          },
+          "guid": {
+            "title": "Guid",
+            "type": "string",
+            "format": "uuid4"
+          },
+          "spec_guids": {
+            "title": "Spec Guids",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid4"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": ["name"]
+      },
+      "ManifestMeta": {
+        "title": "ManifestMeta",
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "title": "Schema Version",
+            "pattern": "[1-9][0-9]*(\\.[0-9]+){0,2}",
+            "type": "string"
+          },
+          "api": {
+            "$ref": "#/definitions/ManifestMetaApi"
+          }
+        },
+        "required": ["schema_version", "api"]
+      }
+    }
+  }
+  
