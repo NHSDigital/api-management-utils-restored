@@ -273,51 +273,6 @@
         "required": ["name", "path"],
         "additionalProperties": false
       },
-      "ApigeeApidoc": {
-        "title": "ApigeeApidoc",
-        "type": "object",
-        "properties": {
-          "edgeAPIProductName": {
-            "title": "Edgeapiproductname",
-            "type": "string"
-          },
-          "anonAllowed": {
-            "title": "Anonallowed",
-            "default": true,
-            "type": "boolean"
-          },
-          "description": {
-            "title": "Description",
-            "type": "string"
-          },
-          "requireCallbackUrl": {
-            "title": "Requirecallbackurl",
-            "default": false,
-            "type": "boolean"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "visibility": {
-            "title": "Visibility",
-            "default": false,
-            "type": "boolean"
-          },
-          "specId": {
-            "title": "Specid",
-            "default": "",
-            "type": "string"
-          },
-          "specContent": {
-            "title": "Speccontent",
-            "default": "",
-            "type": "string"
-          }
-        },
-        "required": ["edgeAPIProductName"],
-        "additionalProperties": false
-      },
       "ManifestApigeeEnvironment": {
         "title": "ManifestApigeeEnvironment",
         "type": "object",
