@@ -74,58 +74,6 @@ def put(url, access_token, **kwargs):
     return request("PUT", url, access_token, **kwargs)
 
 
-def select_unique(
-    items: typing.List[typing.Dict[str, typing.Any]],
-    key: str,
-    value: str,
-    valid_lengths: typing.Optional[typing.List[int]] = None,
-) -> typing.List[typing.Dict[str, typing.Any]]:
-
-    selected = [item for item in items if item.get(key) == value]
-    if not valid_lengths:
-        valid_lengths = [0, 1]
-    if len(selected) not in valid_lengths:
-        raise ValueError(f"{JSON.dumps(selected)}")
-    return selected
-
-
-def get_all_apidocs(organization, access_token, task_vars=None, refresh=False):
-    """
-    Get all apidocs for organization. Requires valid apigee acess_token.
-
-    If task_vars is passed in, will search in there for the apidocs.
-    If task_vars is included, will update the task_vars with APIGEE_APIDOCS.
-    """
-    if task_vars is None:
-        task_vars = {}
-
-    apidocs = task_vars.get("APIGEE_APIDOCS")
-
-    if refresh or not apidocs:
-        all_results = []
-
-        params = {
-            "pageSize" : 100
-        }
-        scan = True
-
-        while scan:
-            apidocs_request = get(constants.portal_uri(organization), access_token, params=params)
-            if apidocs_request.get("failed"):
-                return apidocs_request
-
-            next_page_token = apidocs_request["response"]["body"]["next_page_token"]
-            all_results += apidocs_request["response"]["body"]["data"]
-
-            if next_page_token != "":
-                params["pageToken"] = next_page_token
-            else:
-                scan = False
-
-        task_vars.update({"APIGEE_APIDOCS": all_results})
-    return task_vars
-
-
 def get_all_spec_resources(organization, access_token, task_vars=None, refresh=False):
     """
     Get all spec_resources for organization.  Requires valid apigee

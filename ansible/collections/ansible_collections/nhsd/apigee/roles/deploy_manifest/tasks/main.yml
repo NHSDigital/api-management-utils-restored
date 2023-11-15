@@ -62,14 +62,3 @@
     organization: "{{ APIGEE_ORGANIZATION }}"
     access_token: "{{ APIGEE_ACCESS_TOKEN }}"
   loop: "{{ apigee_environment.specs }}"
-
-- name: deploy api catalog
-  nhsd.apigee.deploy_api_catalog_item:
-    api_catalog_item: "{{ item }}"
-    organization: "{{ APIGEE_ORGANIZATION }}"
-    access_token: "{{ APIGEE_ACCESS_TOKEN }}"
-  loop: "{{ apigee_environment.api_catalog }}"
-  # See comment on product loop control. (I believe APIDocs
-  # actually can reference products that don't exist. But this is
-  # cleaner.)
-  when: APIGEE_ORGANIZATION == 'nhsd-prod' and item.edgeAPIProductName | regex_search('^' + SERVICE_NAME + '-' + PULL_REQUEST | default(APIGEE_ENVIRONMENT))
