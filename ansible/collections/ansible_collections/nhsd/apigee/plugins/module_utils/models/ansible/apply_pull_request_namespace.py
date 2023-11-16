@@ -59,11 +59,4 @@ class ApplyPullRequestNamespace(pydantic.BaseModel):
             for spec in env.specs:
                 spec.name = spec.name.replace(old, new, 1)
             
-            for entry in env.api_catalog:
-                entry.edgeAPIProductName = entry.edgeAPIProductName.replace(
-                    old, new, 1
-                )
-                entry.title =  f"[{display}] {entry.title}"
-                entry.specId = entry.specId.replace(old, new, 1)
-
         return manifest
