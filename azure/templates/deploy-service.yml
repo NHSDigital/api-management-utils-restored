@@ -131,7 +131,7 @@ steps:
         export SOURCE_COMMIT_ID=$(Build.SourceVersion)
         export RELEASE_RELEASEID=$(Build.BuildId)
 
-        ASSUMED_VERSION=$(echo $SERVICE_ARTIFACT_NAME | grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+-?[a-z]*" | tail -1)
+        export ASSUMED_VERSION=`echo $SERVICE_ARTIFACT_NAME | ( grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+-?[a-z]*" || true ) | tail -1`
         if [[ ! -z $ASSUMED_VERSION ]]; then
           export DEPLOYED_VERSION=$ASSUMED_VERSION
         else
@@ -203,8 +203,9 @@ steps:
 
       source $(SERVICE_DIR)/.build_env_vars
 
-      if [[ $SERVICE_ARTIFACT_NAME == v* ]]; then
-        export DEPLOYED_VERSION=`echo $SERVICE_ARTIFACT_NAME | grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+-?[a-z]*" | tail -1`
+      export ASSUMED_VERSION=`echo $SERVICE_ARTIFACT_NAME | ( grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+-?[a-z]*" || true ) | tail -1`
+      if [[ ! -z $ASSUMED_VERSION ]]; then
+        export DEPLOYED_VERSION=$ASSUMED_VERSION
       else
         export DEPLOYED_VERSION="${{ parameters.fully_qualified_service_name }}"
       fi
