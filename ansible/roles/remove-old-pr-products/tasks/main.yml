@@ -1,16 +1,4 @@
 
-- name: "get developers"
-  uri:
-    url: "{{ developers_uri }}?expand=true"
-    headers:
-      Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
-    return_content: yes
-  register: get_developers
-
-- name: "map developers"
-  set_fact:
-    dev_id_to_email: "{{ get_developers.json.developer | dict_list_to_map('developerId', 'email') }}"
-
 - name: "get apps"
   uri:
     url: "{{ apps_uri }}?expand=true"

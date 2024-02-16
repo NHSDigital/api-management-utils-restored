@@ -45,15 +45,28 @@
 
 - name: get teams
   uri:
-    url: "https://apigee.com/consumers/api/providers/{{ audience_id }}/teams"
+    url: "{{ companies_uri }}?expand=true"
     headers:
       Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
     return_content: yes
   register: get_teams
 
+- name: get team members
+  uri:
+    url: "{{ companies_uri }}/{{ item | replace(' ', '%20') }}/developers"
+    headers:
+      Authorization: "Bearer {{ APIGEE_ACCESS_TOKEN }}"
+    return_content: yes
+  register: get_team_members
+  loop: "{{ get_teams.json.company | map(attribute='name') }}"
+
+- name: setup developer team members map
+  set_fact:
+    team_members_map: "{{ get_team_members | json_query('results[*].{members: json.developer, name: item}') }}"
+
 - name: setup developer teams map
   set_fact:
-    teams_map: "{{ get_teams.json.data | apigee_teams_map }}"
+    teams_map: "{{ get_team_members | json_query('results[*].{members: json.developer[*].email, name: item}') | apigee_teams_map(teams=get_teams.json.company) }}"
 
 - name: "get apps"
   uri:
