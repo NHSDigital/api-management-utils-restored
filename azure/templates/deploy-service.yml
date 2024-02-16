@@ -133,7 +133,7 @@ steps:
         export RELEASE_RELEASEID=$(Build.BuildId)
 
         echo "Setting assumed version"
-        ASSUMED_VERSION=$(echo $SERVICE_ARTIFACT_NAME | grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+-?[a-z]*" | tail -1)
+        ASSUMED_VERSION=$(echo `$SERVICE_ARTIFACT_NAME` | grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+-?[a-z]*" | tail -1)
         echo "Setting deployed version"
         if [[ ! -z $ASSUMED_VERSION ]]; then
           echo "Setting deployed=assumed"
