@@ -2,6 +2,7 @@ org_uri: "https://api.enterprise.apigee.com/v1/organizations/{{ APIGEE_ORGANIZAT
 products_uri: "{{ org_uri }}/apiproducts"
 apps_uri: "{{ org_uri }}/apps"
 developers_uri: "{{ org_uri }}/developers"
+companies_uri: "{{ org_uri }}/companies"
 retain_hours:  "{{ (lookup('env', 'retain_hours') or 72) }}"
 product_filter: "{{ lookup('env', 'PRODUCT_FILTER') }}"
 portals_base_uri: "https://apigee.com/portals/api/sites"
