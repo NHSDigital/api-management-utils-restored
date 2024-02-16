@@ -1,6 +1,6 @@
 
 
-- debug: msg="{{ product_slug }} - {{ item.appName}} - {{ dev_id_to_email[item.developerId] }} - {{ apigee_teams_to_members[dev_id_to_email[item.developerId]] | default(dev_id_to_email[item.developerId]) }}"
+- debug: msg="{{ product_slug }} - {{ item.appName}} - {{ product_app_mapping_to_owner_display(dev_id_to_email, item) }} - {{ apigee_teams_to_members(teams_map)[product_app_mapping_to_owner_display(dev_id_to_email, item)] | default(product_app_mapping_to_owner_display(dev_id_to_email, item)) }}"
   loop: "{{ product_app_map.get(product_slug, []) }}"
   loop_control:
     label: "{{ product_slug }} - {{ item.appName }} - {{ item.appId }}"
