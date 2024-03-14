@@ -171,7 +171,7 @@
             "items": {
               "anyOf": [
                 {
-                  "anyOf": [
+                  "oneOf": [
                     {
                       "$ref": "#/definitions/ApigeeProductAttributeAccess"
                     },
