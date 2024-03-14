@@ -27,6 +27,10 @@ def test_correct_namespace_with_both_types_of_suffix():
     assert correct_namespace("canary-api-suffix-internal-dev-application-restricted", API_NAME, ENV_NAME) is True
 
 
+def test_correct_namespace_with_number_in_suffix():
+    assert correct_namespace("canary-api-suffix1-internal-dev-suffix2", API_NAME, ENV_NAME) is True
+
+
 def test_correct_namespace_missing_hyphen_1():
     assert correct_namespace("canary-apisuffix-internal-dev-application-restricted", API_NAME, ENV_NAME) is False
 

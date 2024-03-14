@@ -25,7 +25,7 @@ def correct_namespace(name, api_name, env_name) -> bool:
     :param api_name: The meta.api.name item from your manifest
     :param env_name: The environment name (e.g. 'internal-dev', 'int', or 'prod')
     """
-    regex = f"^{api_name}(-[a-z]+)*-{env_name}(-[a-z]+)*$"
+    regex = f"^{api_name}(-[a-z0-9]+)*-{env_name}(-[a-z0-9]+)*$"
     return bool(re.match(regex, name))
 
 
