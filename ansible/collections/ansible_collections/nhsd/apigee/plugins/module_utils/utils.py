@@ -25,7 +25,7 @@ def delta(before, after, keys_to_ignore=None):
     )
 
 
-def request(method, url, access_token, json=None, headers=None, status_code=None, session=None, params=None):
+def request(method, url, access_token, json=None, headers=None, status_code=None, session=None, params=None, get_all_specs=False):
     if not status_code:
         status_code = [200]
 
@@ -37,6 +37,11 @@ def request(method, url, access_token, json=None, headers=None, status_code=None
     if session is None:
         session = requests
     response = session.request(method, url, json=json, headers=headers, params=params)
+    if get_all_specs:
+        print("GET ALL SPECS - STATUS CODE")
+        print(response.status_code)
+        print("GET ALL SPECS - TEXT")
+        print(response.text)
 
     response_dict = {
         "response": {"status_code": response.status_code, "reason": response.reason,},
@@ -88,7 +93,7 @@ def get_all_spec_resources(organization, access_token, task_vars=None, refresh=F
     spec_resources = task_vars.get("APIGEE_SPEC_RESOURCES")
     if refresh or not spec_resources:
         specs_list_uri = constants.APIGEE_DAPI_URL + f"/organizations/{organization}/specs/folder/home"
-        all_specs_response = get(specs_list_uri, access_token)
+        all_specs_response = get(specs_list_uri, access_token, status_code=[200], get_all_specs=True)
         all_specs = all_specs_response["response"]["body"]
         if all_specs.get("failed"):
             return all_specs
