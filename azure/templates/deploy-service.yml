@@ -248,7 +248,7 @@ steps:
       export DIST_DIR=$(SERVICE_DIR)
       export PULL_REQUEST="${{ parameters.pr_label }}"
 
-      make --no-print-directory -C $(UTILS_DIR)/ansible deploy-manifest
+      make --no-print-directory -C $(UTILS_DIR)/ansible deploy-manifest -vvv
     displayName: 'Deploy Manifest'
 
   - ${{ if parameters.proxy_path }}:
