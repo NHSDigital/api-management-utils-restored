@@ -39,7 +39,7 @@ ifneq ($(filter $(first_target),$(cmd_targets)),)
 endif
 
 ansible: guard-cmd
-	@account=$(account) poetry run make --no-print-directory -C ansible $(cmd)
+	@account=$(account) poetry run make --no-print-directory -C ansible $(cmd) -vvv
 
 remove-stale-locks:
 	@poetry run python ./scripts/terraform_force_unlock.py
