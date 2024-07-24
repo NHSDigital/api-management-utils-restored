@@ -31,7 +31,7 @@ validate-manifest: guard-DIST_DIR
 	@poetry run ansible-playbook $(VERBOSE) -i local validate-manifest.yml
 
 deploy-manifest: guard-APIGEE_ENVIRONMENT guard-APIGEE_ORGANIZATION guard-APIGEE_ACCESS_TOKEN
-	@poetry run ansible-playbook $(VERBOSE) --diff $(CHECK) -i local deploy-manifest.yml
+	@poetry run ansible-playbook -vvv --diff $(CHECK) -i local deploy-manifest.yml
 
 build-ecs-proxies: guard-build_label guard-service_id guard-CONTAINER_VARS_FILE
 	@poetry run ansible-playbook -i local build-ecs-proxies.yml
