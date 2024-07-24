@@ -56,9 +56,9 @@
   # manifest manages proxies too.
   when: item.name | regex_search('^' + SERVICE_NAME + '-' + PULL_REQUEST | default(APIGEE_ENVIRONMENT))
 
-- name: deploy apigee specs
-  nhsd.apigee.deploy_spec:
-    spec: "{{ item }}"
-    organization: "{{ APIGEE_ORGANIZATION }}"
-    access_token: "{{ APIGEE_ACCESS_TOKEN }}"
-  loop: "{{ apigee_environment.specs }}"
+# - name: deploy apigee specs
+#   nhsd.apigee.deploy_spec:
+#     spec: "{{ item }}"
+#     organization: "{{ APIGEE_ORGANIZATION }}"
+#     access_token: "{{ APIGEE_ACCESS_TOKEN }}"
+#   loop: "{{ apigee_environment.specs }}"
