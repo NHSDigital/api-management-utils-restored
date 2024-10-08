@@ -148,6 +148,9 @@ parameters:
     default: 'DEPRECATED'
   - name: spec_file
     default: 'DEPRECATED'
+  - name: python_version
+    type: string
+    default: "3.8"
 
 
 extends:
