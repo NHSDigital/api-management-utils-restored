@@ -18,9 +18,6 @@ parameters:
   - name: test_steps
     type: stepList
     default: []
-  - name: post_lint
-    type: stepList
-    default: []
   - name: notify
     type: boolean
     default: true
