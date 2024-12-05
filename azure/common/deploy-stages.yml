@@ -16,7 +16,8 @@ parameters:
     type: boolean
   - name: python_version
     type: string
-
+  - name: agent_pool
+    type: string
 
 
 stages:

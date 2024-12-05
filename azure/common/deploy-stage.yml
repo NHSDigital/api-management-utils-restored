@@ -72,6 +72,8 @@ parameters:
       - jinja_templates
   - name: python_version
     type: string
+  - name: agent_pool
+    type: string
 
 stages:
   - stage: ${{ parameters.stage_name }}
@@ -80,7 +82,7 @@ stages:
       - deployment: deploy
         environment: ${{ parameters.environment }}
         pool:
-          name: 'AWS-ECS'
+          name: ${{ parameters.agent_pool }}
         workspace:
           clean: all
         strategy:
