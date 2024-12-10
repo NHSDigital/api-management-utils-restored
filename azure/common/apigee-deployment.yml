@@ -151,6 +151,9 @@ parameters:
   - name: python_version
     type: string
     default: "3.8"
+  - name: agent_pool
+    type: string
+    default: "AWS-ECS"
 
 
 extends:
