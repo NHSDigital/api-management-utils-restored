@@ -70,6 +70,10 @@ parameters:
       - config_ids
       - depends_on
       - jinja_templates
+  - name: python_version
+    type: string
+  - name: agent_pool
+    type: string
 
 stages:
   - stage: ${{ parameters.stage_name }}
@@ -78,7 +82,7 @@ stages:
       - deployment: deploy
         environment: ${{ parameters.environment }}
         pool:
-          name: 'AWS-ECS'
+          name: ${{ parameters.agent_pool }}
         workspace:
           clean: all
         strategy:
@@ -121,9 +125,9 @@ stages:
                     aws_account: "${{ parameters.aws_account }}"
 
                 - task: UsePythonVersion@0
-                  displayName: 'Use Python 3.8'
+                  displayName: "Use Python ${{ parameters.python_version }}"
                   inputs:
-                    versionSpec: 3.8
+                    versionSpec: ${{ parameters.python_version }}
 
                 - template: "../components/set-facts.yml"
                   parameters:

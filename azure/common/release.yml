@@ -60,6 +60,10 @@ parameters:
   - name: producer_approval
     type: boolean
     default: false
+  - name: python_version
+    type: string
+  - name: agent_pool
+    type: string
 
 stages:
   - ${{ if eq(parameters.environment, 'manual-approval') }}:

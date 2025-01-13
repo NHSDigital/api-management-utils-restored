@@ -27,13 +27,19 @@ parameters:
   - name: cache_steps
     type: stepList
     default: []
+  - name: python_version
+    type: string
+    default: "3.8"
+  - name: agent_pool
+    type: string
+    default: "AWS-ECS"
 
 jobs:
   - job: build
     displayName: Build & Test
     timeoutInMinutes: 30
     pool:
-      name: 'AWS-ECS'
+      name: ${{ parameters.agent_pool }}
     workspace:
       clean: all
     variables:
@@ -138,9 +144,9 @@ jobs:
           service_name: "${{ parameters.service_name }}"
 
       - task: UsePythonVersion@0
-        displayName: "Use Python 3.8"
+        displayName: "Use Python ${{ parameters.python_version }}"
         inputs:
-          versionSpec: "3.8"
+          versionSpec: ${{ parameters.python_version }}
 
       - ${{ each cache_step in parameters.cache_steps }}:
           - ${{ cache_step }}
