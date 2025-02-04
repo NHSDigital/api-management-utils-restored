@@ -9,7 +9,7 @@ workspace: "api-deployment:{{ account }}:{{ apigee_environment }}:{{ service_id 
 service_cpu: "{{ docker_service_cpu | default(256) }}"
 service_memory: "{{ docker_service_memory | default(512) }}"
 do_not_terraform: "{{ lookup('env','do_not_terraform') }}"
-default_desired_capacity: "{{ docker_service_desired_capacity | 2 if apigee_environment in ('prod', 'ref') else 1  }}"
+default_desired_capacity: "{{ docker_service_desired_capacity | default(2 if apigee_environment in ('prod', 'ref') else 1) }}"
 autoscaling_policy: "{{ docker_service_autoscaling | default({}) | as_ecs_autoscaling }}"
 health_check_grace_period_seconds: "{{ docker_service_health_check_grace_period_seconds | default(60) }}"
 deregistration_delay: "{{ docker_service_dereg_delay | default(120) }}"
