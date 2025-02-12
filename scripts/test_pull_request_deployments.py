@@ -57,9 +57,7 @@ def main():
     for process in jobs:
         if process.exitcode != 0:
             print("A job failed")
-            # uncomment this line once authentication to azure is working
-            # so the job fails if there is a problem with deployment actions
-            # sys.exit(1)
+            sys.exit(1)
     sys.exit(0)
 
 
