@@ -15,8 +15,8 @@ class AzureDevOps:
         self.client_secret = os.environ["AZ_CLIENT_SECRET"]
         self.client_tenant = os.environ["AZ_CLIENT_TENANT"]
         self.access_token = self._get_access_token()
-        self.token = self.access_token
-        self.auth = requests.auth.HTTPBasicAuth("", self.token)
+        # self.token = self.access_token
+        self.auth = requests.auth.HTTPBasicAuth("", self.access_token)
         self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
         self.notify_github_repo = "NHSDigital/api-management-utils"
