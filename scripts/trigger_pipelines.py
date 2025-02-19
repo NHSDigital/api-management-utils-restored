@@ -15,8 +15,6 @@ class AzureDevOps:
         self.client_secret = os.environ["AZ_CLIENT_SECRET"]
         self.client_tenant = os.environ["AZ_CLIENT_TENANT"]
         self.access_token = self._get_access_token()
-        self.token = self.access_token
-        self.auth = requests.auth.HTTPBasicAuth("", self.token)
         self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
         self.notify_github_repo = "NHSDigital/api-management-utils"
@@ -46,7 +44,6 @@ class AzureDevOps:
             method='post',
         )
         self.print_response(response, f"Initial request to {run_url}")
-        print("Response Check In Pipeline Run", response.status_code)
 
         result = "failed"
         if response.status_code == 200:
@@ -79,20 +76,6 @@ class AzureDevOps:
                     },
                     "self": {"refName": f"{pipeline_branch}"},
                 }
-            },
-            "variables": {
-                "NOTIFY_GITHUB_REPOSITORY": {
-                    "isSecret  ": False,
-                    "value": f"{self.notify_github_repo}",
-                },
-                "NOTIFY_COMMIT_SHA": {
-                    "isSecret  ": False,
-                    "value": f"{self.notify_commit_sha}"
-                },
-                "UTILS_PR_NUMBER": {
-                    "isSecret  ": False,
-                    "value": f"{self.utils_pr_number}",
-                }
             }
         }
 
@@ -107,6 +90,7 @@ class AzureDevOps:
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         res = requests.post(url=url, data=data, headers=headers)
         res.raise_for_status()
+
         return res.json()["access_token"]
 
     def api_request(
@@ -121,11 +105,14 @@ class AzureDevOps:
     ):
         def get_headers():
 
-            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.token}"}
+            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.access_token}"}
             _headers.update(headers or {})
             return _headers
 
         _params = {"api-version": api_version}
+        _params = {"NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo}
+        _params = {"NOTIFY_COMMIT_SHA": self.notify_commit_sha}
+        _params = {"UTILS_PR_NUMBER": self.utils_pr_number}
         _params.update(params or {})
         action = getattr(requests, method)
 
@@ -139,7 +126,7 @@ class AzureDevOps:
 
             if result.status_code in (203, 401):
                 print("REFRESHING ACCESS TOKEN...")
-                self.token = self._get_access_token()
+                self.access_token = self._get_access_token()
 
             time.sleep(0.5 * tries)
             result = action(uri, params=_params, headers=get_headers(), **kwargs)
