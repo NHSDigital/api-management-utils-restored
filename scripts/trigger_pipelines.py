@@ -121,7 +121,7 @@ class AzureDevOps:
     ):
         def get_headers():
 
-            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.access_token}"}
+            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.token}"}
             _headers.update(headers or {})
             return _headers
 
@@ -131,7 +131,7 @@ class AzureDevOps:
 
         result = action(uri, params=_params, headers=get_headers(), **kwargs)
         tries = 0
-        while result.status_code not in (200, 201, 202, 204, 203):
+        while result.status_code not in (200, 201, 202, 204):
             tries += 1
 
             if tries > max_tries:
