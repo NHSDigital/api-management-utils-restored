@@ -109,10 +109,10 @@ class AzureDevOps:
             _headers.update(headers or {})
             return _headers
 
-        _params = {"api-version": api_version}
-        _params = {"NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo}
-        _params = {"NOTIFY_COMMIT_SHA": self.notify_commit_sha}
-        _params = {"UTILS_PR_NUMBER": self.utils_pr_number}
+        _params = {"api-version": api_version, "NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo, "NOTIFY_COMMIT_SHA": self.notify_commit_sha, "UTILS_PR_NUMBER": self.utils_pr_number}
+        # _params = {"NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo}
+        # _params = {"NOTIFY_COMMIT_SHA": self.notify_commit_sha}
+        # _params = {"UTILS_PR_NUMBER": self.utils_pr_number}
         _params.update(params or {})
         action = getattr(requests, method)
 
