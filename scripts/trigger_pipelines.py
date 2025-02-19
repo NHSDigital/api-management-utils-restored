@@ -105,6 +105,7 @@ class AzureDevOps:
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         res = requests.post(url=url, data=data, headers=headers)
         res.raise_for_status()
+        print("AccessTokenCheck", res.json()["access_token"])
         return res.json()["access_token"]
 
     def api_request(
