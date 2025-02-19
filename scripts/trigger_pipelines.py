@@ -19,7 +19,6 @@ class AzureDevOps:
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
         self.notify_github_repo = "NHSDigital/api-management-utils"
         self.api_request_delay = 60
-        print("Access Token Printed", self.access_token)
 
     @staticmethod
     def print_response(response: requests.Response, note: str, verbose: bool = True) -> None:
@@ -105,7 +104,7 @@ class AzureDevOps:
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         res = requests.post(url=url, data=data, headers=headers)
         res.raise_for_status()
-
+        print("status Check", res.status_code)
         return res.json()["access_token"]
 
     def api_request(

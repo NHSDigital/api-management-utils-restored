@@ -11,6 +11,7 @@ jobs:
 
     - name: Test Pull Request Deployments
       env:
+        AZURE_TOKEN: "${{ secrets.AZURE_TOKEN }}"
         AZ_CLIENT_ID: "${{ secrets.AZ_CLIENT_ID }}"
         AZ_CLIENT_SECRET: "${{ secrets.AZ_CLIENT_SECRET }}"
         AZ_CLIENT_TENANT: "${{ secrets.AZ_CLIENT_TENANT }}"
