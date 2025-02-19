@@ -15,9 +15,9 @@ class AzureDevOps:
         self.client_secret = os.environ["AZ_CLIENT_SECRET"]
         self.client_tenant = os.environ["AZ_CLIENT_TENANT"]
         self.access_token = self._get_access_token()
-        self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
-        self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
-        self.notify_github_repo = "NHSDigital/api-management-utils"
+        # self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
+        # self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
+        # self.notify_github_repo = "NHSDigital/api-management-utils"
         self.api_request_delay = 60
 
     @staticmethod
