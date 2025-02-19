@@ -14,9 +14,7 @@ class AzureDevOps:
         self.client_id = os.environ["AZ_CLIENT_ID"]
         self.client_secret = os.environ["AZ_CLIENT_SECRET"]
         self.client_tenant = os.environ["AZ_CLIENT_TENANT"]
-        self.access_token = self._get_access_token
-        self.token = self.access_token
-        self.auth = requests.auth.HTTPBasicAuth("", self.token)
+        self.access_token = self._get_access_token()
         self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
         self.notify_github_repo = "NHSDigital/api-management-utils"
@@ -39,7 +37,6 @@ class AzureDevOps:
 
         run_url = self.base_url + f"/{pipeline_id}/runs"
         request_body = self._build_request_body(pipeline_branch)
-        print("A Request Body", request_body)
 
         response = self.api_request(
             run_url,
@@ -47,6 +44,7 @@ class AzureDevOps:
             method='post',
         )
         self.print_response(response, f"Initial request to {run_url}")
+        print("Response Check In Pipeline Run", response.status_code)
 
         result = "failed"
         if response.status_code == 200:
@@ -121,7 +119,7 @@ class AzureDevOps:
     ):
         def get_headers():
 
-            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.token}"}
+            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.access_token}"}
             _headers.update(headers or {})
             return _headers
 
@@ -138,8 +136,8 @@ class AzureDevOps:
                 break
 
             if result.status_code in (203, 401):
-                print("REFRESHING ACCESS TOKEN...", result.status_code)
-                self.token = self._get_access_token()
+                print("REFRESHING ACCESS TOKEN...")
+                self.access_token = self._get_access_token()
 
             time.sleep(0.5 * tries)
             result = action(uri, params=_params, headers=get_headers(), **kwargs)
