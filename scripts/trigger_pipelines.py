@@ -131,7 +131,7 @@ class AzureDevOps:
 
         result = action(uri, params=_params, headers=get_headers(), **kwargs)
         tries = 0
-        while result.status_code not in (200, 201, 202, 204):
+        while result.status_code not in (200, 201, 202, 204, 203):
             tries += 1
 
             if tries > max_tries:
