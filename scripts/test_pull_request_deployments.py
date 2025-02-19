@@ -25,6 +25,7 @@ PULL_REQUEST_PIPELINES = {
 
 def trigger_pipelines(pipeline_ids: dict, service: str):
     azure_dev_ops = AzureDevOps()
+    print("azureDevopsResponse", azure_dev_ops)
     build_status = azure_dev_ops.run_pipeline(
         service=service,
         pipeline_type="build",
