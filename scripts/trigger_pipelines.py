@@ -15,6 +15,7 @@ class AzureDevOps:
         self.client_secret = os.environ["AZ_CLIENT_SECRET"]
         self.client_tenant = os.environ["AZ_CLIENT_TENANT"]
         self.access_token = self._get_access_token()
+        self.token = self.access_token
         self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
         self.notify_github_repo = "NHSDigital/api-management-utils"
@@ -119,7 +120,7 @@ class AzureDevOps:
     ):
         def get_headers():
 
-            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.access_token}"}
+            _headers = {"Accept": "application/json", "Authorization": f"Bearer {self.token}"}
             _headers.update(headers or {})
             return _headers
 
@@ -137,7 +138,7 @@ class AzureDevOps:
 
             if result.status_code in (203, 401):
                 print("REFRESHING ACCESS TOKEN...")
-                self.access_token = self._get_access_token()
+                self.token = self._get_access_token()
 
             time.sleep(0.5 * tries)
             result = action(uri, params=_params, headers=get_headers(), **kwargs)
