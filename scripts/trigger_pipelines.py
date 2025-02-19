@@ -37,6 +37,7 @@ class AzureDevOps:
 
         run_url = self.base_url + f"/{pipeline_id}/runs"
         request_body = self._build_request_body(pipeline_branch)
+        print("A Request Body", request_body)
 
         response = self.api_request(
             run_url,
