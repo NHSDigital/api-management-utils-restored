@@ -139,7 +139,7 @@ class AzureDevOps:
 
             if result.status_code in (203, 401):
                 print("REFRESHING ACCESS TOKEN...", result.status_code)
-                self.access_token = self._get_access_token()
+                self.token = self._get_access_token()
 
             time.sleep(0.5 * tries)
             result = action(uri, params=_params, headers=get_headers(), **kwargs)
