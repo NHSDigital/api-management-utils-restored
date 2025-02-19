@@ -56,7 +56,7 @@ class AzureDevOps:
     def _check_pipeline_response(self, response: requests.Response):
         delay = 0
         state_url = response.json()["_links"]["self"]["href"]
-        print("response check from our end", response.json())
+        print("response check from our end", response.status_code)
         while response.status_code == 200 and response.json()["state"] == "inProgress":
             time.sleep(self.api_request_delay)
             delay = delay + self.api_request_delay
