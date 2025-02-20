@@ -18,7 +18,7 @@ class AzureDevOps:
         self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
         self.notify_github_repo = "NHSDigital/api-management-utils"
-        self.api_request_delay = 10
+        self.api_request_delay = 60
 
     @staticmethod
     def print_response(response: requests.Response, note: str, verbose: bool = True) -> None:
@@ -43,7 +43,7 @@ class AzureDevOps:
             json=request_body,
             method='post',
         )
-        # self.print_response(response, f"Initial request to {run_url}")
+        self.print_response(response, f"Initial request to {run_url}")
 
         result = "failed"
         if response.status_code == 200:
@@ -61,8 +61,9 @@ class AzureDevOps:
             time.sleep(self.api_request_delay)
             delay = delay + self.api_request_delay
             state_response = self.api_request(state_url)
-            # self.print_response(state_response, f"Response from {state_url} after {delay} seconds")
-            print("response check from our end", state_response.json()["state"])
+            print("response check from our end----------", state_response.json()["state"])
+            self.print_response(state_response, f"Response from {state_url} after {delay} seconds")
+            # print("response check from our end", state_response.json()["state"])
         return response.json()["result"]
 
     def _build_request_body(self, pipeline_branch: str):
