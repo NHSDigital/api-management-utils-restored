@@ -61,8 +61,8 @@ class AzureDevOps:
             time.sleep(self.api_request_delay)
             delay = delay + self.api_request_delay
             state_response = self.api_request(state_url)
-            print("response check from our end----------", state_response.json()["status_code"])
-            self.print_response(state_response, f"Response from {state_url} after {delay} seconds")
+            print("response check from our end----------", state_response.json())
+            # self.print_response(state_response, f"Response from {state_url} after {delay} seconds")
             # print("response check from our end", state_response.json()["state"])
         return response.json()["result"]
 
