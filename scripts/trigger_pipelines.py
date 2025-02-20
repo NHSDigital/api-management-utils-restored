@@ -60,9 +60,10 @@ class AzureDevOps:
         while response.status_code == 200 and response.json()["state"] == "inProgress":
             time.sleep(self.api_request_delay)
             delay = delay + self.api_request_delay
-            state_response = self.api_request(state_url)
-            print("response check from our end----------", state_response.json())
-            # self.print_response(state_response, f"Response from {state_url} after {delay} seconds")
+            response = self.api_request(state_url)
+
+            print("response check from our end----------", response.status_code, response.json()["state"])
+            #  self.print_response(response, f"Response from {state_url} after {delay} seconds")
             # print("response check from our end", state_response.json()["state"])
         return response.json()["result"]
 
