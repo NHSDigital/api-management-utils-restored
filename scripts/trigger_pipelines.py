@@ -56,12 +56,13 @@ class AzureDevOps:
     def _check_pipeline_response(self, response: requests.Response):
         delay = 0
         state_url = response.json()["_links"]["self"]["href"]
-        print("response check from our end", response.status_code)
+        print("response check from our Start", response.status_code, response.json()["state"])
         while response.status_code == 200 and response.json()["state"] == "inProgress":
             time.sleep(self.api_request_delay)
             delay = delay + self.api_request_delay
             state_response = self.api_request(state_url)
             self.print_response(state_response, f"Response from {state_url} after {delay} seconds")
+            print("response check from our end", response.status_code, response.json()["state"])
         return response.json()["result"]
 
     def _build_request_body(self, pipeline_branch: str):
@@ -111,9 +112,6 @@ class AzureDevOps:
             return _headers
 
         _params = {"api-version": api_version, "NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo, "NOTIFY_COMMIT_SHA": self.notify_commit_sha, "UTILS_PR_NUMBER": self.utils_pr_number}
-        # _params = {"NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo}
-        # _params = {"NOTIFY_COMMIT_SHA": self.notify_commit_sha}
-        # _params = {"UTILS_PR_NUMBER": self.utils_pr_number}
         _params.update(params or {})
         action = getattr(requests, method)
 
