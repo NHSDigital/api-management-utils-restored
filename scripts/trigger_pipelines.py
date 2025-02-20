@@ -62,7 +62,7 @@ class AzureDevOps:
             delay = delay + self.api_request_delay
             state_response = self.api_request(state_url)
             self.print_response(state_response, f"Response from {state_url} after {delay} seconds")
-            print("response check from our end", response.status_code, response.json()["state"])
+            print("response check from our end", state_response.json(), state_response.json()["state"])
         return response.json()["result"]
 
     def _build_request_body(self, pipeline_branch: str):
