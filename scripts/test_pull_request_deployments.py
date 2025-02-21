@@ -5,21 +5,11 @@ from trigger_pipelines import AzureDevOps
 
 
 PULL_REQUEST_PIPELINES = {
-    "identity-service": {
-        "build": 27,
-        "pr": 54,
-        "branch": "refs/heads/master"
-    },
     "canary-api": {
         "build": 222,
         "pr": 223,
         "branch": "refs/heads/main"
-    },
-    "personal-demographics-service": {
-        "build": 140,
-        "pr": 144,
-        "branch": "refs/heads/master"
-    },
+    }
 }
 
 
