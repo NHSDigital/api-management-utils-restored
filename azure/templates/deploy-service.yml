@@ -248,7 +248,6 @@ steps:
       export DIST_DIR=$(SERVICE_DIR)
       echo  PULL_REQUEST="${{ parameters.pr_label }}".
       export PULL_REQUEST="${{ parameters.pr_label }}"
-
       make --no-print-directory -C $(UTILS_DIR)/ansible deploy-manifest
     displayName: 'Deploy Manifest'
 
