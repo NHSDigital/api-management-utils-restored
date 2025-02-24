@@ -246,7 +246,6 @@ steps:
       export APIGEE_ORGANIZATION="nhsd-${{ parameters.apigee_organization }}"
       export ANSIBLE_FORCE_COLOR=yes
       export DIST_DIR=$(SERVICE_DIR)
-      echo  PULL_REQUEST="${{ parameters.pr_label }}".
       export PULL_REQUEST="${{ parameters.pr_label }}"
       make --no-print-directory -C $(UTILS_DIR)/ansible deploy-manifest
     displayName: 'Deploy Manifest'
