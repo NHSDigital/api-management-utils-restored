@@ -23,13 +23,8 @@ def trigger_pipelines(pipeline_ids: dict, service: str):
     )
     if build_status != "succeeded":
         sys.exit(1)
+        print(f"Build pipeline for {service} failed with status: {build_status}")
         return
-    # azure_dev_ops.run_pipeline(
-    #     service=service,
-    #     pipeline_type="pr",
-    #     pipeline_id=pipeline_ids["pr"],
-    #     pipeline_branch=pipeline_ids["branch"]
-    # )
 
 
 def main():
