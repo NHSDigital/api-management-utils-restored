@@ -14,6 +14,8 @@ class AzureDevOps:
         self.client_id = os.environ["AZ_CLIENT_ID"]
         self.client_secret = os.environ["AZ_CLIENT_SECRET"]
         self.client_tenant = os.environ["AZ_CLIENT_TENANT"]
+        if not all([self.client_id, self.client_secret, self.client_tenant]):
+            raise ValueError("Client ID, Secret, or Tenant is not set in the environment variables.")
         self.access_token = self._get_access_token()
         self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
