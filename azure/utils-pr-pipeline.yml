@@ -30,9 +30,9 @@ jobs:
       clean: all
     steps:
       - task: UsePythonVersion@0
-        displayName: 'Use Python 3.8'
+        displayName: 'Use Python 3.10'
         inputs:
-          versionSpec: 3.8
+          versionSpec: 3.10
 
       - bash: |
           instance_id="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
@@ -103,12 +103,12 @@ jobs:
         displayName: Install utils pre-requisites
 
       - bash: |
-          ANSIBLE_FORCE_COLOR=yes poetry run ansible-test units --python=3.8
+          ANSIBLE_FORCE_COLOR=yes poetry run ansible-test units --python=3.10
         workingDirectory: ansible/collections/ansible_collections/nhsd/apigee
         displayName: Unit test ansible
 
       - bash: |
-          ANSIBLE_FORCE_COLOR=yes poetry run ansible-test integration --python=3.8
+          ANSIBLE_FORCE_COLOR=yes poetry run ansible-test integration --python=3.10
         workingDirectory: ansible/collections/ansible_collections/nhsd/apigee
         displayName: Integration test ansible
         
