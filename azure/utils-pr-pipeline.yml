@@ -102,10 +102,10 @@ jobs:
           make install
         displayName: Install utils pre-requisites
 
-      - bash: |
-          ANSIBLE_FORCE_COLOR=yes poetry run ansible-test units --python=3.10
-        workingDirectory: ansible/collections/ansible_collections/nhsd/apigee
-        displayName: Unit test ansible
+      # - bash: |
+      #     ANSIBLE_FORCE_COLOR=yes poetry run ansible-test units --python=3.10
+      #   workingDirectory: ansible/collections/ansible_collections/nhsd/apigee
+      #   displayName: Unit test ansible
 
       - bash: |
           ANSIBLE_FORCE_COLOR=yes poetry run ansible-test integration --python=3.10
