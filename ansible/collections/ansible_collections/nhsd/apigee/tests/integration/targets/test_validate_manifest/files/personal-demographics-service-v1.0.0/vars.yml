@@ -1,1 +1,2 @@
 SERVICE_NAME: personal-demographics
+DIST_DIR: "{{ lookup('env', 'DIST_DIR') }}"
