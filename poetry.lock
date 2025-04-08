@@ -2,36 +2,32 @@
 
 [[package]]
 name = "ansible"
-version = "8.7.0"
+version = "2.10.7"
 description = "Radically simple IT automation"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 files = [
-    {file = "ansible-8.7.0-py3-none-any.whl", hash = "sha256:fa7d3bc2dfdb0ab031df645814ff86b15cb5ec041bfbee4041f795abfa5646ca"},
-    {file = "ansible-8.7.0.tar.gz", hash = "sha256:3a5ca5152e4547d590e40b542d76b18dbbe2b36da4edd00a13a7c51a374ff737"},
+    {file = "ansible-2.10.7.tar.gz", hash = "sha256:9ff024500116d53c460cb09ea92e3c9404119f100d1d1ff0de69a9dafca561d5"},
 ]
 
 [package.dependencies]
-ansible-core = ">=2.15.7,<2.16.0"
+ansible-base = ">=2.10.5,<2.11"
 
 [[package]]
-name = "ansible-core"
-version = "2.15.13"
+name = "ansible-base"
+version = "2.10.17"
 description = "Radically simple IT automation"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 files = [
-    {file = "ansible_core-2.15.13-py3-none-any.whl", hash = "sha256:e7f50bbb61beae792f5ecb86eff82149d3948d078361d70aedb01d76bc483c30"},
-    {file = "ansible_core-2.15.13.tar.gz", hash = "sha256:f542e702ee31fb049732143aeee6b36311ca48b7d13960a0685afffa0d742d7f"},
+    {file = "ansible-base-2.10.17.tar.gz", hash = "sha256:ef925882ca8d4c3c2ccd091cde199e0c869024ccad0d07a337dcf207bff32f34"},
 ]
 
 [package.dependencies]
 cryptography = "*"
-importlib-resources = {version = ">=5.0,<5.1", markers = "python_version < \"3.10\""}
-jinja2 = ">=3.0.0"
+jinja2 = "*"
 packaging = "*"
-PyYAML = ">=5.1"
-resolvelib = ">=0.5.3,<1.1.0"
+PyYAML = "*"
 
 [[package]]
 name = "ansible-lint"
@@ -81,17 +77,17 @@ tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
 [[package]]
 name = "awscli"
-version = "1.38.28"
+version = "1.38.29"
 description = "Universal Command Line Environment for AWS."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "awscli-1.38.28-py3-none-any.whl", hash = "sha256:37238ab1527aefad4d4bd271b2b292cafd7e59b4cc31ef806106d33fd8eea0e0"},
-    {file = "awscli-1.38.28.tar.gz", hash = "sha256:012d28e1c6ed9eb54bca653bbe892c5bd2cf5036284c36ce2c01bab1f203c620"},
+    {file = "awscli-1.38.29-py3-none-any.whl", hash = "sha256:a13c6a9c6a29b48a0b7bb2a0432a400aeabbac158f430a5bd6d1b5f717d441a8"},
+    {file = "awscli-1.38.29.tar.gz", hash = "sha256:1f4176e606a40a6353aefc5f823801e56805b0634a9797d039188a9ef590e070"},
 ]
 
 [package.dependencies]
-botocore = "1.37.28"
+botocore = "1.37.29"
 colorama = ">=0.2.5,<0.4.7"
 docutils = ">=0.10,<0.17"
 PyYAML = ">=3.10,<6.1"
@@ -146,17 +142,17 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.37.28"
+version = "1.37.29"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.37.28-py3-none-any.whl", hash = "sha256:e584d9d33808633e73af3d962e22cf2cea91a38bc5a17577bb25618f8ded504f"},
-    {file = "boto3-1.37.28.tar.gz", hash = "sha256:09ee85ba70a88286bba0d1bf5f0460a4b3bde52d162216accfe637b8bfac351b"},
+    {file = "boto3-1.37.29-py3-none-any.whl", hash = "sha256:869979050e2cf6f5461503e0f1c8f226e47ec02802e88a2210f085ec22485945"},
+    {file = "boto3-1.37.29.tar.gz", hash = "sha256:5702e38356b93c56ed2a27e17f7664d791f1fe2eafd58ae6ab3853b2804cadd2"},
 ]
 
 [package.dependencies]
-botocore = ">=1.37.28,<1.38.0"
+botocore = ">=1.37.29,<1.38.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.11.0,<0.12.0"
 
@@ -165,13 +161,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.37.28"
+version = "1.37.29"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.37.28-py3-none-any.whl", hash = "sha256:c26b645d7b125bf42ffc1671b862b47500ee658e3a1c95d2438cb689fc85df15"},
-    {file = "botocore-1.37.28.tar.gz", hash = "sha256:69ea327f70f0607d174c4c2b1dcc87327b9c48e413c9d322179172b614b28e03"},
+    {file = "botocore-1.37.29-py3-none-any.whl", hash = "sha256:092c41e346df37a8d7cf60a799791f8225ad3a5ba7cda749047eb31d1440b9c5"},
+    {file = "botocore-1.37.29.tar.gz", hash = "sha256:728c1ef3b66a0f79bc08008a59f6fd6bef2a0a0195e5b3b9e9bef255df519890"},
 ]
 
 [package.dependencies]
@@ -660,21 +656,6 @@ files = [
 
 [package.extras]
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
-
-[[package]]
-name = "importlib-resources"
-version = "5.0.7"
-description = "Read resources from Python packages"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "importlib_resources-5.0.7-py3-none-any.whl", hash = "sha256:2238159eb743bd85304a16e0536048b3e991c531d1cd51c4a834d1ccf2829057"},
-    {file = "importlib_resources-5.0.7.tar.gz", hash = "sha256:4df460394562b4581bb4e4087ad9447bd433148fba44241754ec3152499f1d1b"},
-]
-
-[package.extras]
-docs = ["jaraco.packaging (>=8.2)", "rst.linker (>=1.9)", "sphinx"]
-testing = ["pytest (>=3.5,!=3.7.3)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=1.2.3)", "pytest-cov", "pytest-enabler", "pytest-flake8", "pytest-mypy"]
 
 [[package]]
 name = "jinja2"
@@ -1383,23 +1364,6 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
-name = "resolvelib"
-version = "1.0.1"
-description = "Resolve abstract dependencies into concrete ones"
-optional = false
-python-versions = "*"
-files = [
-    {file = "resolvelib-1.0.1-py2.py3-none-any.whl", hash = "sha256:d2da45d1a8dfee81bdd591647783e340ef3bcb104b54c383f70d422ef5cc7dbf"},
-    {file = "resolvelib-1.0.1.tar.gz", hash = "sha256:04ce76cbd63fded2078ce224785da6ecd42b9564b1390793f64ddecbe997b309"},
-]
-
-[package.extras]
-examples = ["html5lib", "packaging", "pygraphviz", "requests"]
-lint = ["black", "flake8", "isort", "mypy", "types-requests"]
-release = ["build", "towncrier", "twine"]
-test = ["commentjson", "packaging", "pytest"]
-
-[[package]]
 name = "rich"
 version = "14.0.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
@@ -1699,4 +1663,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "287bcf158c2e6d7dca25225c38aa7c305cc5a5572762d577ec7b4e3eaadfe09b"
+content-hash = "5b87c6386e5b26c00315050ed3ccb404251b3db997ecfe4e72720003d24c7449"
