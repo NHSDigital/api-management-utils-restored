@@ -18,7 +18,6 @@
   include_role:
     name: validate_manifest
     vars_from: "{{ DIST_DIR }}/vars.yml"
-    no_log: true
   loop: "{{ DIST_DIRS }}"
   loop_control:
     loop_var: DIST_DIR
