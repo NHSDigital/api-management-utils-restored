@@ -154,6 +154,9 @@ parameters:
   - name: agent_pool
     type: string
     default: "AWS-ECS"
+  - name: job_timeout_in_minutes
+    type: number
+    default: 60
 
 
 extends:

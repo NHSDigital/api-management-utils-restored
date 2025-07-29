@@ -64,6 +64,9 @@ parameters:
     type: string
   - name: agent_pool
     type: string
+  - name: job_timeout_in_minutes
+    type: number
+    default: 60
 
 stages:
   - ${{ if eq(parameters.environment, 'manual-approval') }}:
