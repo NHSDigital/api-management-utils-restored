@@ -74,6 +74,9 @@ parameters:
     type: string
   - name: agent_pool
     type: string
+  - name: job_timeout_in_minutes
+    type: number
+    default: 60
 
 stages:
   - stage: ${{ parameters.stage_name }}
@@ -81,6 +84,7 @@ stages:
     jobs:
       - deployment: deploy
         environment: ${{ parameters.environment }}
+        timeoutInMinutes: ${{ parameters.job_timeout_in_minutes }}
         pool:
           name: ${{ parameters.agent_pool }}
         workspace:
