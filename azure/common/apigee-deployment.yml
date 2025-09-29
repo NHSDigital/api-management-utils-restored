@@ -23,20 +23,20 @@ parameters:
   - name: fully_qualified_service_name
     displayName: Supply a custom name for your release (only valid for release pipeline)
     type: string
-    default: ''
+    default: ""
   - name: ping
     displayName: Toggle ping endpoint avaliablility
     type: boolean
     default: true
   - name: hosted_target_connection_path_suffix
     type: string
-    default: ''
+    default: ""
   - name: hosted_target_healthcheck_suffix
     type: string
-    default: '/_status'
+    default: "/_status"
   - name: jinja_templates
     type: object
-    displayName:  Key/values for custom jinja templating
+    displayName: Key/values for custom jinja templating
     default: []
   - name: enable_monitoring
     type: boolean
@@ -85,7 +85,7 @@ parameters:
   - name: manual_approval_env
     displayName: Custom manual approval env overwrite
     type: string
-    default: 'manual-approval'
+    default: "manual-approval"
   - name: _scoped_pipeline_vars
     type: object
     displayName: All the pipeline parameters which support per-environment scoping.
@@ -121,12 +121,12 @@ parameters:
   - name: _pipeline_defaults
     type: object
     default:
-      - name_suffix: '-Pull-Request'
+      - name_suffix: "-Pull-Request"
         deploy_template: pr.yml
         environments:
-        - internal-dev
-        - internal-dev-sandbox
-      - name_suffix: '-Release'
+          - internal-dev
+          - internal-dev-sandbox
+      - name_suffix: "-Release"
         deploy_template: release.yml
         environments:
           - internal-dev
@@ -139,22 +139,21 @@ parameters:
           - prod
     # Deprecated pipeline variables.
   - name: product_display_name
-    default: 'DEPRECATED'
+    default: "DEPRECATED"
   - name: product_description
-    default: 'DEPRECATED'
+    default: "DEPRECATED"
   - name: portal_api_requires_callback_url
-    default: 'DEPRECATED'
+    default: "DEPRECATED"
   - name: make_spec_visible
-    default: 'DEPRECATED'
+    default: "DEPRECATED"
   - name: spec_file
-    default: 'DEPRECATED'
+    default: "DEPRECATED"
   - name: python_version
     type: string
-    default: "3.8"
+    default: "3.9"
   - name: agent_pool
     type: string
     default: "AWS-ECS"
-
 
 extends:
   template: ./deploy-stages.yml
@@ -172,74 +171,74 @@ extends:
         ${{ if gt(length(parameters.apigee_deployments), 0) }}:
           apigee_deployments:
             - ${{ each apigee_deployment in parameters.apigee_deployments }}:
-              - ${{ if and(eq(apigee_deployment.environment, 'prod'), parameters.prod_requires_approval) }}:
-                - environment: manual-approval
-                  stage_name: manual_approval
-                  depends_on: []
-                  manual_approval_prod: true
-                  producer_approval: ${{ parameters.prod_producer_approval }}
-                  ${{ each var in parameters._scoped_pipeline_vars }}:
-                      ${{ var }}: ${{ parameters[var] }}
+                - ${{ if and(eq(apigee_deployment.environment, 'prod'), parameters.prod_requires_approval) }}:
+                    - environment: manual-approval
+                      stage_name: manual_approval
+                      depends_on: []
+                      manual_approval_prod: true
+                      producer_approval: ${{ parameters.prod_producer_approval }}
+                      ${{ each var in parameters._scoped_pipeline_vars }}:
+                        ${{ var }}: ${{ parameters[var] }}
             - ${{ each apigee_deployment in parameters.apigee_deployments }}:
-              - environment: ${{ apigee_deployment.environment }}
-                stage_name: ${{ replace(coalesce (apigee_deployment.stage_name, apigee_deployment.environment), '-', '_') }}
-                ${{ each var in parameters._scoped_pipeline_vars }}:
-                  ${{ if apigee_deployment[var] }}:
-                    ${{ if containsValue(parameters._scoped_step_list_vars, var) }}:
-                      ${{ var }}:
-                        - ${{ each step in apigee_deployment[var] }}:
-                            ${{ each pair in step }}:
-                              # Assume scoped template paths are
-                              # relative to azure/ in @self repo
-                              ${{ if and(eq(pair.key, 'template'), not(contains(pair.value, '@'))) }}:
-                                ${{ pair.key }}: azure/${{ pair.value }}@self
-                              ${{ if not(and(eq(pair.key, 'template'), not(contains(pair.value, '@')))) }}:
-                                ${{ pair.key }}: ${{ pair.value }}
-                    ${{ if not(containsValue(parameters._scoped_step_list_vars, var)) }}:
-                      ${{ var }}: ${{ apigee_deployment[var] }}
-                  ${{ if not(apigee_deployment[var]) }}:
-                    ${{ var }}: ${{ parameters[var] }}
-                ${{ if not(apigee_deployment.depends_on) }}:
-                  ${{ if or(startsWith(apigee_deployment.environment, 'internal-'), eq(apigee_deployment.environment, 'manual-approval')) }}:
-                    depends_on: []
-                  ${{ if and(not(startsWith(apigee_deployment.environment, 'internal-')), ne(apigee_deployment.environment, 'manual-approval')) }}:
-                    depends_on:
-                      - internal_qa
-                      - ${{ if and(eq(apigee_deployment.environment, 'prod'), parameters.prod_requires_approval) }}:
-                        - manual_approval
-                ${{ if apigee_deployment.depends_on }}:
+                - environment: ${{ apigee_deployment.environment }}
+                  stage_name: ${{ replace(coalesce (apigee_deployment.stage_name, apigee_deployment.environment), '-', '_') }}
+                  ${{ each var in parameters._scoped_pipeline_vars }}:
+                    ${{ if apigee_deployment[var] }}:
+                      ${{ if containsValue(parameters._scoped_step_list_vars, var) }}:
+                        ${{ var }}:
+                          - ${{ each step in apigee_deployment[var] }}:
+                              ${{ each pair in step }}:
+                                # Assume scoped template paths are
+                                # relative to azure/ in @self repo
+                                ${{ if and(eq(pair.key, 'template'), not(contains(pair.value, '@'))) }}:
+                                  ${{ pair.key }}: azure/${{ pair.value }}@self
+                                ${{ if not(and(eq(pair.key, 'template'), not(contains(pair.value, '@')))) }}:
+                                  ${{ pair.key }}: ${{ pair.value }}
+                      ${{ if not(containsValue(parameters._scoped_step_list_vars, var)) }}:
+                        ${{ var }}: ${{ apigee_deployment[var] }}
+                    ${{ if not(apigee_deployment[var]) }}:
+                      ${{ var }}: ${{ parameters[var] }}
+                  ${{ if not(apigee_deployment.depends_on) }}:
+                    ${{ if or(startsWith(apigee_deployment.environment, 'internal-'), eq(apigee_deployment.environment, 'manual-approval')) }}:
+                      depends_on: []
+                    ${{ if and(not(startsWith(apigee_deployment.environment, 'internal-')), ne(apigee_deployment.environment, 'manual-approval')) }}:
+                      depends_on:
+                        - internal_qa
+                        - ${{ if and(eq(apigee_deployment.environment, 'prod'), parameters.prod_requires_approval) }}:
+                            - manual_approval
+                  ${{ if apigee_deployment.depends_on }}:
                     depends_on:
                       - ${{ each depend_on in apigee_deployment.depends_on }}:
-                        - ${{ depend_on }}
+                          - ${{ depend_on }}
                       - ${{ if and(eq(apigee_deployment.environment, 'prod'), parameters.prod_requires_approval) }}:
-                        - manual_approval
+                          - manual_approval
 
         # otherwise set the default parameters for this pipeline
         ${{ if eq(0, length(parameters.apigee_deployments)) }}:
           apigee_deployments:
             - ${{ each environment in pipeline_default.environments }}:
-              - ${{ if notIn(environment, 'internal-dev-sandbox') }}:
-                - environment: ${{ environment }}
-                  stage_name: ${{ replace(environment, '-', '_') }}
-                  ${{ if startsWith(environment, 'internal-') }}:
-                    depends_on: []
-                  ${{ if not(startsWith(environment, 'internal-')) }}:
-                    depends_on:
-                      - internal_qa
-                      - internal_qa_sandbox
-                      - ${{ if and(parameters.prod_requires_approval, eq(environment, 'prod')) }}:
-                        - manual_approval
+                - ${{ if notIn(environment, 'internal-dev-sandbox') }}:
+                    - environment: ${{ environment }}
+                      stage_name: ${{ replace(environment, '-', '_') }}
+                      ${{ if startsWith(environment, 'internal-') }}:
+                        depends_on: []
+                      ${{ if not(startsWith(environment, 'internal-')) }}:
+                        depends_on:
+                          - internal_qa
+                          - internal_qa_sandbox
+                          - ${{ if and(parameters.prod_requires_approval, eq(environment, 'prod')) }}:
+                              - manual_approval
+                      ${{ each var in parameters._scoped_pipeline_vars }}:
+                        ${{ var }}: ${{ parameters[var] }}
+            - ${{ if parameters.deploy_review_sandbox }}:
+                - environment: internal-dev-sandbox
+                  stage_name: internal_dev_sandbox
+                  depends_on: []
                   ${{ each var in parameters._scoped_pipeline_vars }}:
                     ${{ var }}: ${{ parameters[var] }}
-            - ${{ if parameters.deploy_review_sandbox }}:
-              - environment: internal-dev-sandbox
-                stage_name: internal_dev_sandbox
-                depends_on: []
-                ${{ each var in parameters._scoped_pipeline_vars }}:
-                    ${{ var }}: ${{ parameters[var] }}
             - ${{ if and(parameters.prod_requires_approval, containsValue(pipeline_default.environments, 'prod')) }}:
-              - environment: manual-approval
-                stage_name: manual_approval
-                depends_on: []
-                ${{ each var in parameters._scoped_pipeline_vars }}:
+                - environment: manual-approval
+                  stage_name: manual_approval
+                  depends_on: []
+                  ${{ each var in parameters._scoped_pipeline_vars }}:
                     ${{ var }}: ${{ parameters[var] }}
