@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "api-management-utils"
+name = "api-management-utils-restored"
 version = "0.1.0"
 description = ""
 authors = ["Laurence Smith <laurence.smith@airelogic.com>"]
