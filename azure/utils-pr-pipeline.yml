@@ -100,7 +100,7 @@ jobs:
       - bash: |
           ls -R
           make install
-        displayName: Install utils pre-requisites
+        displayName: Install utils pre-requisites from repo
 
       - bash: |
           ANSIBLE_FORCE_COLOR=yes poetry run ansible-test units --python=3.9
