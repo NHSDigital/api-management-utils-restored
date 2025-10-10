@@ -3,10 +3,10 @@ parameters:
     displayName: State
     type: string
     values:
-      - pending  # A build is underway
-      - success  # A build succeeded
-      - failure  # A build failed in an expected way, e.g. the tests failed
-      - error    # A build finishes for an unexpected reason, e.g. error in bash step, bad config
+      - pending # A build is underway
+      - success # A build succeeded
+      - failure # A build failed in an expected way, e.g. the tests failed
+      - error # A build finishes for an unexpected reason, e.g. error in bash step, bad config
   - name: description
     displayName: Description
     type: string
@@ -36,7 +36,7 @@ steps:
       if [[ "$(NOTIFY_COMMIT_SHA)" =~ ^[0-9a-f]+$ ]]; then
           echo "Reporting state ${{ parameters.state }} to ${NOTIFY_GITHUB_REPOSITORY}"
           echo "##[debug] Hitting https://api.github.com/repos/${NOTIFY_GITHUB_REPOSITORY}/statuses/$(NOTIFY_COMMIT_SHA)"
-          curl --fail -q -X POST "https://api.github.com/repos/${NOTIFY_GITHUB_REPOSITORY}/statuses/$(NOTIFY_COMMIT_SHA)" -d '{"state": "${{ parameters.state }}", "context": "$(Build.DefinitionName) ${{ parameters.environment }}", "description": "${{ parameters.description }}", "target_url": "https://dev.azure.com/NHSD-APIM/API Platform/_build/results?buildId=$(Build.BuildID)"}' --user $(GITHUB_USER):$(GITHUB_ACCESS_TOKEN)
+          curl --fail -q -X POST "https://api.github.com/repos/${NOTIFY_GITHUB_REPOSITORY}/statuses/$(NOTIFY_COMMIT_SHA)" -d '{"state": "${{ parameters.state }}", "context": "$(Build.DefinitionName) ${{ parameters.environment }}", "description": "${{ parameters.description }}", "target_url": "https://dev.azure.com/NHSD-APIM-RESTORE-ORG/API Platform/_build/results?buildId=$(Build.BuildID)"}' --user $(GITHUB_USER):$(GITHUB_ACCESS_TOKEN)
       else
         echo "##[warning]$(NOTIFY_COMMIT_SHA) doesn't look like a commit hash"
         echo "##[task.logissue type=warning]Task wasn't able to find the right commit sha value to notify github."

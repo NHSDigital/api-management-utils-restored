@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "api-management-utils"
+name = "api-management-utils-restored"
 version = "0.1.0"
 description = ""
 authors = ["Laurence Smith <laurence.smith@airelogic.com>"]
@@ -7,7 +7,7 @@ license = "MIT"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 docopt = "^0.6.2"
 jinja2 = "^3.1.2"
 requests = "^2.23.0"

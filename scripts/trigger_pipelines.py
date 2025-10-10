@@ -10,14 +10,14 @@ import requests
 class AzureDevOps:
 
     def __init__(self):
-        self.base_url = "https://dev.azure.com/NHSD-APIM/API Platform/_apis/pipelines"
+        self.base_url = "https://dev.azure.com/NHSD-APIM-RESTORE-ORG/API Platform/_apis/pipelines"
         self.client_id = os.environ["AZ_CLIENT_ID"]
         self.client_secret = os.environ["AZ_CLIENT_SECRET"]
         self.client_tenant = os.environ["AZ_CLIENT_TENANT"]
         self.access_token = self._get_access_token()
         self.notify_commit_sha = os.environ["NOTIFY_COMMIT_SHA"]
         self.utils_pr_number = os.environ["UTILS_PR_NUMBER"]
-        self.notify_github_repo = "NHSDigital/api-management-utils"
+        self.notify_github_repo = "NHSDigital/api-management-utils-restored"
         self.api_request_delay = 60
 
     @staticmethod
@@ -29,11 +29,7 @@ class AzureDevOps:
             except json.decoder.JSONDecodeError:
                 print(response.content.decode())
 
-    def run_pipeline(self,
-                     service: str,
-                     pipeline_type: str,
-                     pipeline_id: int,
-                     pipeline_branch: str) -> int:
+    def run_pipeline(self, service: str, pipeline_type: str, pipeline_id: int, pipeline_branch: str) -> int:
 
         run_url = self.base_url + f"/{pipeline_id}/runs"
         request_body = self._build_request_body(pipeline_branch)
@@ -41,7 +37,7 @@ class AzureDevOps:
         response = self.api_request(
             run_url,
             json=request_body,
-            method='post',
+            method="post",
         )
         self.print_response(response, f"Initial request to {run_url}")
 
@@ -69,7 +65,7 @@ class AzureDevOps:
                 "repositories": {
                     "common": {
                         "repository": {
-                            "fullName": "NHSDigital/api-management-utils",
+                            "fullName": "NHSDigital/api-management-utils-restored",
                             "type": "gitHub",
                         },
                         "refName": f"refs/pull/{self.utils_pr_number}/merge",
@@ -109,7 +105,12 @@ class AzureDevOps:
             _headers.update(headers or {})
             return _headers
 
-        _params = {"api-version": api_version, "NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo, "NOTIFY_COMMIT_SHA": self.notify_commit_sha, "UTILS_PR_NUMBER": self.utils_pr_number}
+        _params = {
+            "api-version": api_version,
+            "NOTIFY_GITHUB_REPOSITORY": self.notify_github_repo,
+            "NOTIFY_COMMIT_SHA": self.notify_commit_sha,
+            "UTILS_PR_NUMBER": self.utils_pr_number,
+        }
         _params.update(params or {})
         action = getattr(requests, method)
 

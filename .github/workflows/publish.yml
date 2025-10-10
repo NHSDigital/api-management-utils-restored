@@ -3,49 +3,49 @@ name: Publish / Calculate Version
 on: push
 
 jobs:
-    build:
-        name: calculate version
-        runs-on: ubuntu-22.04
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              with:
-                  fetch-depth: 0  # This causes all history to be fetched, which is required for calculate-version to function
+  build:
+    name: calculate version
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # This causes all history to be fetched, which is required for calculate-version to function
 
-            - name: Install Python 3.8
-              uses: actions/setup-python@v5
-              with:
-                  python-version: 3.8
+      - name: Install Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
 
-            - name: Install poetry
-              run: pip install poetry
+      - name: Install poetry
+        run: pip install poetry
 
-            - name: Cache poetry packages
-              uses: actions/cache@v4
-              id: cache
-              with:
-                path: ~/.venv
-                key: ${{ runner.os }}-utils-venv-${{ hashFiles('**/poetry.lock') }}
+      - name: Cache poetry packages
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: ~/.venv
+          key: ${{ runner.os }}-utils-venv-${{ hashFiles('**/poetry.lock') }}
 
-            - name: Install
-              run: poetry install
-              if: steps.cache.outputs.cache-hit != 'true'
+      - name: Install
+        run: poetry install
+        if: steps.cache.outputs.cache-hit != 'true'
 
-            - name: Set SPEC_VERSION env var
-              run: |
-                version="$(poetry run python scripts/calculate_version.py)"
-                echo "${version}"
-                echo ::set-env name=SPEC_VERSION::${version}
-              env:
-                ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      - name: Set SPEC_VERSION env var
+        run: |
+          version="$(poetry run python scripts/calculate_version.py)"
+          echo "${version}"
+          echo ::set-env name=SPEC_VERSION::${version}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
-            - name: Create release (master only)
-              id: create-release
-              if: github.ref == 'refs/heads/master'
-              uses: actions/create-release@v1
-              continue-on-error: true
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  tag_name: ${{ env.SPEC_VERSION }}
-                  release_name: ${{ env.SPEC_VERSION }}
+      - name: Create release (master only)
+        id: create-release
+        if: github.ref == 'refs/heads/master'
+        uses: actions/create-release@v1
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.SPEC_VERSION }}
+          release_name: ${{ env.SPEC_VERSION }}
