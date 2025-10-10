@@ -151,6 +151,7 @@ jobs:
           - ${{ cache_step }}
 
       - bash: |
+          export PATH="$HOME/.local/bin:$PATH"
           n=0
           until [ "$n" -ge 3 ]
           do
@@ -196,6 +197,7 @@ jobs:
         displayName: cache utils dependencies
 
       - bash: |
+          export PATH="$HOME/.local/bin:$PATH"
           make install
           sleep 5
         workingDirectory: "${{ parameters.service_name }}/utils"
