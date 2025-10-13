@@ -151,11 +151,7 @@ jobs:
           - ${{ cache_step }}
 
       - bash: |
-          echo "Before set path:"
-          python --version
           export PATH="$HOME/.local/bin:$PATH"
-          echo "Before make install:"
-          python --version
           n=0
           until [ "$n" -ge 3 ]
           do
@@ -201,11 +197,7 @@ jobs:
         displayName: cache utils dependencies
 
       - bash: |
-          echo "Before set path:"
-          python --version
           export PATH="$HOME/.local/bin:$PATH"
-          echo "Before make install:"
-          python --version
           make install
           sleep 5
         workingDirectory: "${{ parameters.service_name }}/utils"
