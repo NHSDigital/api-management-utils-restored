@@ -12,4 +12,4 @@ def _localstack() -> bool:
 def api_registry() -> str:
     if _localstack():
         return "http://localhost:9000"
-    return "https://api-registry.prod.api.platform.nhs.uk:9000"
+    return "https://api-registry.ptlrestored.api.platform.nhs.uk:9000"

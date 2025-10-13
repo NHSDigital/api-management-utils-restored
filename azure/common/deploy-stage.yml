@@ -22,7 +22,7 @@ parameters:
   - name: fully_qualified_service_name
   - name: service_base_path
   - name: pr_label
-    default: ''
+    default: ""
   - name: secret_file_ids
     type: object
   - name: secret_ids
@@ -154,27 +154,27 @@ stages:
                     apigee_organization: ${{ parameters.apigee_organization }}
 
                 - ${{ if parameters.notify }}:
-                  - bash: |
-                      if [[ -z $(NOTIFY_COMMIT_SHA) ]]; then
-                          export NOTIFY_COMMIT_SHA=`echo "$(Build.SourceVersionMessage)" | cut -d' ' -f2`
-                          echo "##vso[task.setvariable variable=NOTIFY_COMMIT_SHA]$NOTIFY_COMMIT_SHA"
-                      else
-                          echo "##[debug]Using already provided NOTIFY_COMMIT_SHA=$(NOTIFY_COMMIT_SHA)"
-                      fi
-                    displayName: Set NOTIFY_COMMIT_SHA
+                    - bash: |
+                        if [[ -z $(NOTIFY_COMMIT_SHA) ]]; then
+                            export NOTIFY_COMMIT_SHA=`echo "$(Build.SourceVersionMessage)" | cut -d' ' -f2`
+                            echo "##vso[task.setvariable variable=NOTIFY_COMMIT_SHA]$NOTIFY_COMMIT_SHA"
+                        else
+                            echo "##[debug]Using already provided NOTIFY_COMMIT_SHA=$(NOTIFY_COMMIT_SHA)"
+                        fi
+                      displayName: Set NOTIFY_COMMIT_SHA
 
-                  - template: '../components/update-github-status.yml'
-                    parameters:
-                      state: pending
-                      description: "Deploy to ${{ parameters.environment }} started"
-                      environment: ${{ parameters.environment }}
+                    - template: "../components/update-github-status.yml"
+                      parameters:
+                        state: pending
+                        description: "Deploy to ${{ parameters.environment }} started"
+                        environment: ${{ parameters.environment }}
 
                 - ${{ each param in parameters }}:
-                  - ${{ if not(containsValue(parameters._expose_blacklist, param.key)) }}:
-                    - bash: |
-                        set -euo pipefail
-                        echo "##vso[task.setvariable variable=${{ upper(param.key) }}]${{ param.value }}"
-                      displayName: Setting ${{ upper(param.key) }}=${{ param.value }}
+                    - ${{ if not(containsValue(parameters._expose_blacklist, param.key)) }}:
+                        - bash: |
+                            set -euo pipefail
+                            echo "##vso[task.setvariable variable=${{ upper(param.key) }}]${{ param.value }}"
+                          displayName: Setting ${{ upper(param.key) }}=${{ param.value }}
 
                 - bash: |
                     set -euo pipefail
@@ -227,7 +227,7 @@ stages:
                 - bash: |
                     set -euo pipefail
 
-                    INFO=$(curl https://api-registry.prod.api.platform.nhs.uk:9000/api/${{ parameters.service_name }})
+                    INFO=$(curl https://api-registry.ptlrestored.api.platform.nhs.uk:9000/api/${{ parameters.service_name }})
                     SHORT_NAME=$(echo $INFO | jq -r .short_name)
                     GUID=$(echo $INFO | jq -r .guid)
 
@@ -242,7 +242,7 @@ stages:
                   displayName: Check supplied names against API registry
                   continueOnError: true
 
-                - template: '../templates/deploy-service.yml'
+                - template: "../templates/deploy-service.yml"
                   parameters:
                     service_name: ${{ parameters.service_name }}
                     short_service_name: ${{ parameters.short_service_name }}
@@ -263,7 +263,7 @@ stages:
                     post_deploy: ${{ parameters.post_deploy }}
                     ping: ${{ parameters.ping }}
                     enable_monitoring: ${{ parameters.enable_monitoring }}
-                    enable_status_monitoring : ${{ parameters.enable_status_monitoring  }}
+                    enable_status_monitoring: ${{ parameters.enable_status_monitoring  }}
                     portal_api_requires_callback_url: ${{ parameters.portal_api_requires_callback_url }}
                     make_spec_visible: ${{ parameters.make_spec_visible }}
                     friendly_api_name: ${{ parameters.friendly_api_name }}
@@ -272,16 +272,16 @@ stages:
                     aws_account: ${{ parameters.aws_account }}
 
                 - ${{ if parameters.notify }}:
-                  - template: '../components/update-github-status.yml'
-                    parameters:
-                      state: success
-                      on_success: true
-                      description: "Deploy to ${{ parameters.environment }} succeeded"
-                      environment: ${{ parameters.environment }}
+                    - template: "../components/update-github-status.yml"
+                      parameters:
+                        state: success
+                        on_success: true
+                        description: "Deploy to ${{ parameters.environment }} succeeded"
+                        environment: ${{ parameters.environment }}
 
-                  - template: '../components/update-github-status.yml'
-                    parameters:
-                      state: failure
-                      on_failure: true
-                      description: "Deploy to ${{ parameters.environment }} failed"
-                      environment: ${{ parameters.environment }}
+                    - template: "../components/update-github-status.yml"
+                      parameters:
+                        state: failure
+                        on_failure: true
+                        description: "Deploy to ${{ parameters.environment }} failed"
+                        environment: ${{ parameters.environment }}
