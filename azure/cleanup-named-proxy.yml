@@ -26,21 +26,20 @@ parameters:
     default: False
 
   - name: remove_ecr_build_role
-    displayName: Remove the ECR build role and pre-reqs for all deployments 
+    displayName: Remove the ECR build role and pre-reqs for all deployments
     type: boolean
     default: False
-  
+
   - name: force_remove_from_apps
     displayName: Force remove specifed product from subscribed apps
     type: boolean
     default: False
 
-
 stages:
-  - ${{ if in(parameters.environment, 'internal-qa', 'ref', 'internal-qa-sandbox', 'internal-dev-sandbox', 'internal-dev') }}:
+  - ${{ if in(parameters.environment, 'internal-qa', 'ref', 'res', 'internal-qa-sandbox', 'internal-dev-sandbox', 'internal-dev') }}:
       - template: ./components/remove-target-proxy.yml
         parameters:
-          apigee_org: nonprod         
+          apigee_org: nonprod
           service_name: ${{ parameters.service_name }}
           service_name_short: ${{ parameters.service_name_short }}
           has_ecs_backend: ${{ parameters.has_ecs_backend }}

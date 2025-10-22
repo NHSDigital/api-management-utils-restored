@@ -35,6 +35,7 @@ class AddJwksResourceUrlToApp(pydantic.BaseModel):
         "internal-qa",
         "internal-qa-sandbox",
         "ref",
+        "res",
         "dev",
         "int",
         "sandbox",
@@ -56,11 +57,10 @@ class AddJwksResourceUrlToApp(pydantic.BaseModel):
             "internal-qa",
             "internal-qa-sandbox",
             "ref",
+            "res",
         ]
         if org == "nhsd-nonprod" and environment not in non_prod_envs:
-            raise ValueError(
-                f"Invalid environment {environment} for organization {org}"
-            )
+            raise ValueError(f"Invalid environment {environment} for organization {org}")
         return environment
 
     @pydantic.validator("environment")

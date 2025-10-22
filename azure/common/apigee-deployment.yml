@@ -134,6 +134,7 @@ parameters:
           - internal-qa
           - internal-qa-sandbox
           - ref
+          - res
           - int
           - sandbox
           - prod

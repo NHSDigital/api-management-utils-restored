@@ -12,6 +12,7 @@ parameters:
       - internal-qa
       - internal-qa-sandbox
       - ref
+      - res
       - dev
       - int
       - sandbox
