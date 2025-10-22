@@ -8,6 +8,7 @@ APIGEE_ORG_TO_ENV = {
         "internal-qa",
         "internal-qa-sandbox",
         "ref",
+        "res",
     ],
     "nhsd-prod": ["dev", "int", "sandbox", "prod"],
 }

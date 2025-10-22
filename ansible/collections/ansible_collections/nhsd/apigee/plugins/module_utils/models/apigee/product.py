@@ -22,6 +22,7 @@ LITERAL_APIGEE_ENVIRONMENTS = Literal[
     "internal-qa",
     "internal-qa-sandbox",
     "ref",
+    "res",
     "dev",
     "sandbox",
     "int",
@@ -35,9 +36,7 @@ class ApigeeProductAttributeRateLimiting(BaseModel):
     value: Union[Dict[str, RateLimitingConfig], str]
 
     @validator("value")
-    def validate_ratelimiting(
-        cls, ratelimiting: Union[Dict[str, RateLimitingConfig], str]
-    ) -> str:
+    def validate_ratelimiting(cls, ratelimiting: Union[Dict[str, RateLimitingConfig], str]) -> str:
         """
         Apigee API requires a string.  We decode it as JSON in the
         shared flow.
@@ -110,18 +109,21 @@ PRODUCT_ATTRIBUTE_REGEX = (
     + ")$)"
 )
 
+
 class ApigeeProductAttributeOther(BaseModel):
     name: constr(regex=PRODUCT_ATTRIBUTE_REGEX)
     value: str
 
+
 ApigeeProductAttributeSpecial = Annotated[
-    Union [
+    Union[
         ApigeeProductAttributeAccess,
         ApigeeProductAttributeRateLimit,
         ApigeeProductAttributeRateLimiting,
     ],
-    Field(discriminator="name")
+    Field(discriminator="name"),
 ]
+
 
 def _count_cls(items: List[Any], cls: Type):
     return sum(isinstance(item, cls) for item in items)
@@ -130,16 +132,16 @@ def _count_cls(items: List[Any], cls: Type):
 class ApigeeProduct(BaseModel):
     name: str
     approvalType: Literal["auto", "manual"] = "manual"
-    attributes: List[Union[ApigeeProductAttributeSpecial, ApigeeProductAttributeOther]] = [{"name": "access", "value": "private"}]
+    attributes: List[Union[ApigeeProductAttributeSpecial, ApigeeProductAttributeOther]] = [
+        {"name": "access", "value": "private"}
+    ]
     description: str = None
     displayName: str = None
 
     # Note: This value is manually inserted by apigee_environment
     # object that contains this product. So if you do not provide a
     # value in the manifest file it is still populated.
-    environments: conlist(
-        item_type=LITERAL_APIGEE_ENVIRONMENTS, min_items=1, max_items=1
-    )
+    environments: conlist(item_type=LITERAL_APIGEE_ENVIRONMENTS, min_items=1, max_items=1)
     proxies: List[str] = []
     quota: constr(regex=r"[1-9][0-9]*") = None
     quotaInterval: constr(regex=r"[1-9][0-9]*") = None

@@ -1,6 +1,14 @@
 APIGEE_ORGANIZATIONS: [nhsd-nonprod, nhsd-prod]
 APIGEE_ENVIRONMENTS:
-  nhsd-nonprod: [internal-dev, internal-dev-sandbox, internal-qa, internal-qa-sandbox, ref]
+  nhsd-nonprod:
+    [
+      internal-dev,
+      internal-dev-sandbox,
+      internal-qa,
+      internal-qa-sandbox,
+      ref,
+      res,
+    ]
   nhsd-prod: [dev, sandbox, int, prod]
 
 APIGEE_ENVIRONMENT: "{{ lookup('env','APIGEE_ENVIRONMENT') }}"

@@ -6,6 +6,7 @@ parameters:
       - internal-qa
       - internal-qa-sandbox
       - ref
+      - res
       - dev
       - int
       - sandbox
@@ -67,23 +68,23 @@ parameters:
 
 stages:
   - ${{ if eq(parameters.environment, 'manual-approval') }}:
-    - template: ./deploy-manual-approval.yml
-      parameters:
-        stage_name: ${{ parameters.stage_name }}
-        depends_on: ${{ parameters.depends_on }}
-        ${{ if and(eq(true, parameters.manual_approval_prod), eq(true, parameters.producer_approval)) }}:
-          manual_approval_env: ${{ parameters.service_name }}
-        ${{ if and(eq(true, parameters.manual_approval_prod), eq(false, parameters.producer_approval)) }}:
-          manual_approval_env: manual-approval-prod
-        ${{ if eq(false, parameters.manual_approval_prod) }}:
-          manual_approval_env: ${{ parameters.manual_approval_env }}
+      - template: ./deploy-manual-approval.yml
+        parameters:
+          stage_name: ${{ parameters.stage_name }}
+          depends_on: ${{ parameters.depends_on }}
+          ${{ if and(eq(true, parameters.manual_approval_prod), eq(true, parameters.producer_approval)) }}:
+            manual_approval_env: ${{ parameters.service_name }}
+          ${{ if and(eq(true, parameters.manual_approval_prod), eq(false, parameters.producer_approval)) }}:
+            manual_approval_env: manual-approval-prod
+          ${{ if eq(false, parameters.manual_approval_prod) }}:
+            manual_approval_env: ${{ parameters.manual_approval_env }}
   - ${{ if not(eq(parameters.environment, 'manual-approval')) }}:
-    - template: ./deploy-stage.yml
-      parameters:
-        ${{ if eq('', parameters.fully_qualified_service_name) }}:
-          fully_qualified_service_name: ${{ parameters.service_name }}-${{ parameters.environment }}
-        ${{ if ne('', parameters.fully_qualified_service_name) }}:
-          fully_qualified_service_name: ${{ parameters.fully_qualified_service_name }}
-        ${{ each param in parameters }}:
-          ${{ if notIn(param.key, 'fully_qualified_service_name', 'manual_approval_env', 'manual_approval_prod', 'producer_approval') }}:
-            ${{ param.key }}: ${{ param.value }}
+      - template: ./deploy-stage.yml
+        parameters:
+          ${{ if eq('', parameters.fully_qualified_service_name) }}:
+            fully_qualified_service_name: ${{ parameters.service_name }}-${{ parameters.environment }}
+          ${{ if ne('', parameters.fully_qualified_service_name) }}:
+            fully_qualified_service_name: ${{ parameters.fully_qualified_service_name }}
+          ${{ each param in parameters }}:
+            ${{ if notIn(param.key, 'fully_qualified_service_name', 'manual_approval_env', 'manual_approval_prod', 'producer_approval') }}:
+              ${{ param.key }}: ${{ param.value }}

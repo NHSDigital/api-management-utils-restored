@@ -261,6 +261,10 @@
                 "type": "string"
               },
               {
+                "const": "res",
+                "type": "string"
+              },
+              {
                 "const": "dev",
                 "type": "string"
               },

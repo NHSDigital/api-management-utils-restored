@@ -19,33 +19,32 @@ parameters:
   - name: agent_pool
     type: string
 
-
 stages:
   - ${{ each apigee_deployment in parameters.apigee_deployments }}:
-    - template: ./${{ parameters.deploy_template }}
-      parameters:
-        ${{ insert }}: ${{ apigee_deployment }}
-        ${{ each param in parameters }}:
-          ${{ if notIn(param.key, 'deploy_template', 'apigee_deployments', 'deploy_review_sandbox', 'prod_requires_approval', 'prod_producer_approval') }}:
-            ${{ param.key }}: ${{ param.value }}
+      - template: ./${{ parameters.deploy_template }}
+        parameters:
+          ${{ insert }}: ${{ apigee_deployment }}
+          ${{ each param in parameters }}:
+            ${{ if notIn(param.key, 'deploy_template', 'apigee_deployments', 'deploy_review_sandbox', 'prod_requires_approval', 'prod_producer_approval') }}:
+              ${{ param.key }}: ${{ param.value }}
 
-        # Compute the apigee organization & org level part of the AWS secret/config path
-        ${{ if in(apigee_deployment.environment, 'internal-dev', 'internal-dev-sandbox', 'internal-qa', 'internal-qa-sandbox', 'ref', 'manual-approval') }}:
-          apigee_organization: nonprod
-        ${{ if in(apigee_deployment.environment, 'dev', 'int', 'sandbox', 'prod') }}:
-          apigee_organization: prod
+          # Compute the apigee organization & org level part of the AWS secret/config path
+          ${{ if in(apigee_deployment.environment, 'internal-dev', 'internal-dev-sandbox', 'internal-qa', 'internal-qa-sandbox', 'ref', 'res', 'manual-approval') }}:
+            apigee_organization: nonprod
+          ${{ if in(apigee_deployment.environment, 'dev', 'int', 'sandbox', 'prod') }}:
+            apigee_organization: prod
 
-        # Compute AWS environment level prefix for secrets/config
-        ${{ if notIn(apigee_deployment.environment, 'prod') }}:
-          aws_account: ptl
-        ${{ if in(apigee_deployment.environment, 'prod') }}:
-          aws_account: prod
+          # Compute AWS environment level prefix for secrets/config
+          ${{ if notIn(apigee_deployment.environment, 'prod') }}:
+            aws_account: ptl
+          ${{ if in(apigee_deployment.environment, 'prod') }}:
+            aws_account: prod
 
-        # deploy_review_sandbox not for release pipeline, for now
-        ${{ if eq(parameters.deploy_template, 'pr.yml')}}:
-          deploy_review_sandbox: ${{ parameters.deploy_review_sandbox }}
-          pr_label: pr-${{ replace(replace(replace(variables['Build.SourceBranch'], '/merge', ''), 'refs/pull/', ''), '/', '_') }}
+          # deploy_review_sandbox not for release pipeline, for now
+          ${{ if eq(parameters.deploy_template, 'pr.yml')}}:
+            deploy_review_sandbox: ${{ parameters.deploy_review_sandbox }}
+            pr_label: pr-${{ replace(replace(replace(variables['Build.SourceBranch'], '/merge', ''), 'refs/pull/', ''), '/', '_') }}
 
-        # if Release pipeline use friendly api name for api portal
-        ${{ if eq(parameters.deploy_template, 'release.yml') }}:
-          friendly_api_name: ${{ apigee_deployment.product_display_name }}
+          # if Release pipeline use friendly api name for api portal
+          ${{ if eq(parameters.deploy_template, 'release.yml') }}:
+            friendly_api_name: ${{ apigee_deployment.product_display_name }}

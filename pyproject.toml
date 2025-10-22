@@ -32,6 +32,7 @@ boto3 = "^1.26.20"
 ansible-lint = "^4.2.0"
 black = "^24.3.0"
 flake8 = "^3.8.3"
+pytest = "^5.4.2"
 
 [build-system]
 requires = ["poetry>=0.12"]
