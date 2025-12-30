@@ -227,7 +227,7 @@ stages:
                 - bash: |
                     set -euo pipefail
 
-                    INFO=$(curl https://api-registry.ptlrestored.api.platform.nhs.uk:9000/api/${{ parameters.service_name }})
+                    INFO=$(curl https://api-registry.prodrestored.api.platform.nhs.uk:9000/api/${{ parameters.service_name }})
                     SHORT_NAME=$(echo $INFO | jq -r .short_name)
                     GUID=$(echo $INFO | jq -r .guid)
 
